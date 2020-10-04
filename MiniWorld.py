@@ -11,10 +11,24 @@ def option2():
 
 
 def option3():
-    """
-    Function to implement option 2
-    """
-    print("Not implemented")
+    try:
+        # Takes City name as input
+        print("Enter the CityName to search for: ")
+        city = input()
+        
+        query = "SELECT * FROM EMPLOYEE WHERE city_of_work='%s'" % city
+        print(query)
+        cur.execute(query)
+        print("List of employees")
+        for row in cur:
+            print(row)
+
+        
+
+    except Exception as e:
+        con.rollback()
+        print("Failed to insert into database")
+        print(">>>>>>>>>>>>>", e)
 
 
 def option4():
@@ -97,7 +111,7 @@ while(1):
         con = pymysql.connect(host='localhost',
                               user=username,
                               password=password,
-                              db='COMPANY',
+                              db='dataproj',
                               cursorclass=pymysql.cursors.DictCursor)
         tmp = sp.call('clear', shell=True)
 
@@ -114,7 +128,7 @@ while(1):
                 # Here taking example of Employee Mini-world
                 print("1. Option 1")  # Hire an Employee
                 print("2. Option 2")  # Fire an Employee
-                print("3. Option 3")  # Promote Employee
+                print("3. Display employees for a given city") 
                 print("4. Option 4")  # Employee Statistics
                 print("5. Logout")
                 ch = int(input("Enter choice> "))
