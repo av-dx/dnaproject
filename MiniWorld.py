@@ -18,10 +18,10 @@ def option2():
 
     except Exception as e:
         con.rollback()
-        print("Failed to insert into database")
+        print("Failed to retreive values.")
         print(">>>>>>>>>>>>>", e)
 
-    return;
+    return
 
 
 def option3():
@@ -33,7 +33,7 @@ def option3():
         query = "SELECT * FROM EMPLOYEE WHERE city_of_work='%s'" % city
         print(query)
         cur.execute(query)
-        print("List of employees")
+        print("List of employees in ",city)
         for row in cur:
             print(row)
 
@@ -52,39 +52,39 @@ def option4():
     print("Not implemented")
 
 
-def hireAnEmployee():
-    """
-    This is a sample function implemented for the refrence.
-    This example is related to the Employee Database.
-    In addition to taking input, you are required to handle domain errors as well
-    For example: the SSN should be only 9 characters long
-    Sex should be only M or F
-    If you choose to take Super_SSN, you need to make sure the foreign key constraint is satisfied
-    HINT: Instead of handling all these errors yourself, you can make use of except clause to print the error returned to you by MySQL
-    """
+def makeBooking():
     try:
-        # Takes emplyee details as input
+        # Takes booking details as input
         row = {}
-        print("Enter new employee's details: ")
-        name = (input("Name (Fname Minit Lname): ")).split(' ')
-        row["Fname"] = name[0]
-        row["Minit"] = name[1]
-        row["Lname"] = name[2]
-        row["Ssn"] = input("SSN: ")
-        row["Bdate"] = input("Birth Date (YYYY-MM-DD): ")
-        row["Address"] = input("Address: ")
-        row["Sex"] = input("Sex: ")
-        row["Salary"] = float(input("Salary: "))
-        row["Dno"] = int(input("Dno: "))
+        print("Enter new Booking's details: ")
+        row["cust_id"] = int(input("Customer ID: "))
+        row["agent_id"] = int(input("Agent ID: "))
 
-        query = "INSERT INTO EMPLOYEE(Fname, Minit, Lname, Ssn, Bdate, Address, Sex, Salary, Dno) VALUES('%s', '%c', '%s', '%s', '%s', '%s', '%c', %f, %d)" % (
-            row["Fname"], row["Minit"], row["Lname"], row["Ssn"], row["Bdate"], row["Address"], row["Sex"], row["Salary"], row["Dno"])
+        cur.execute("SELECT fname, lname FROM CUSTOMER WHERE cust_id="+str(row['cust_id']))
+        cust = cur.fetchone()
+        cur.execute("SELECT fname, lname FROM EMPLOYEE WHERE emp_id IN (SELECT agent_id FROM AGENT) AND emp_id="+str(row['agent_id']))
+        agent = cur.fetchone()
 
-        print(query)
-        cur.execute(query)
-        con.commit()
-
-        print("Inserted Into Database")
+        if (cust is None):
+            print("The customer doesn't exist!")
+            return
+        elif (agent is None):
+            print("Agent with that ID doesn't exist")
+            return
+        else:
+            print("Make a booking for Customer :",cust['fname'], cust['lname'],"through Agent :", agent['fname'], agent['lname'],"?", sep=' ')
+            if (input("Y/N : ").lower()=='y'):
+                #add EVENT
+                print("Event Added!")
+                #add PAYMENT (BOOKING)
+                print("Booking Done!")
+                query = "INSERT INTO BOOKS VALUES(%d, %d, %d, %d)" % (
+                    row["event_id"], row["cust_id"], row["agent_id"], row["booking_id"])
+                # [TO FIX] the above will fail as EVENT and BOOKING adding arent yet implemented;
+                cur.execute(query)
+                con.commit()
+                print("Inserted Into Database")
+            return
 
     except Exception as e:
         con.rollback()
@@ -100,7 +100,7 @@ def dispatch(ch):
     """
 
     if(ch == 1):
-        hireAnEmployee()
+        makeBooking()
     elif(ch == 2):
         option2()
     elif(ch == 3):
@@ -125,7 +125,7 @@ while(1):
         con = pymysql.connect(host='localhost',
                               user=username,
                               password=password,
-                              db='PROJECT',
+                              db='dataproj',
                               cursorclass=pymysql.cursors.DictCursor)
         tmp = sp.call('clear', shell=True)
 
@@ -140,8 +140,8 @@ while(1):
             while(1):
                 tmp = sp.call('clear', shell=True)
                 # Here taking example of Employee Mini-world
-                print("1. Option 1")  # Hire an Employee
-                print("2. Option 2")  # Fire an Employee
+                print("1. Make a booking")  # Hire an Employee
+                print("2. Display Average Booking Fee for a city")
                 print("3. Display employees for a given city") 
                 print("4. Option 4")  # Employee Statistics
                 print("5. Logout")
