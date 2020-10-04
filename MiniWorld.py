@@ -45,10 +45,20 @@ def option3():
 
 
 def option4():
-    """
-    Function to implement option 3
-    """
-    print("Not implemented")
+    try:
+        #takes city name as input
+        print("Enter the Cityname you want to search in: ")
+        city = input()
+        query = "SELECT agent_id FROM AGENT WHERE agent_id IN (SELECT emp_id FROM EMPLOYEE WHERE city_of_work='%s')" %(city)
+        cur.execute(query)
+        print("List of Agents")
+        for row in cur:
+            print(row)
+    
+    except Exception as e:
+        con.rollback()
+        print("Sorry :( ")
+        print(">>>>>>>>>>>>>", e)
 
 
 def makeBooking():
