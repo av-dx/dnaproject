@@ -52,46 +52,30 @@ def option4():
     print("Not implemented")
 
 
-def hireAnEmployee():
-    """
-    This is a sample function implemented for the refrence.
-    This example is related to the Employee Database.
-    In addition to taking input, you are required to handle domain errors as well
-    For example: the SSN should be only 9 characters long
-    Sex should be only M or F
-    If you choose to take Super_SSN, you need to make sure the foreign key constraint is satisfied
-    HINT: Instead of handling all these errors yourself, you can make use of except clause to print the error returned to you by MySQL
-    """
-    try:
-        # Takes emplyee details as input
-        row = {}
-        print("Enter new employee's details: ")
-        name = (input("Name (Fname Minit Lname): ")).split(' ')
-        row["Fname"] = name[0]
-        row["Minit"] = name[1]
-        row["Lname"] = name[2]
-        row["Ssn"] = input("SSN: ")
-        row["Bdate"] = input("Birth Date (YYYY-MM-DD): ")
-        row["Address"] = input("Address: ")
-        row["Sex"] = input("Sex: ")
-        row["Salary"] = float(input("Salary: "))
-        row["Dno"] = int(input("Dno: "))
 
-        query = "INSERT INTO EMPLOYEE(Fname, Minit, Lname, Ssn, Bdate, Address, Sex, Salary, Dno) VALUES('%s', '%c', '%s', '%s', '%s', '%s', '%c', %f, %d)" % (
-            row["Fname"], row["Minit"], row["Lname"], row["Ssn"], row["Bdate"], row["Address"], row["Sex"], row["Salary"], row["Dno"])
+def option5():
 
-        print(query)
-        cur.execute(query)
-        con.commit()
 
-        print("Inserted Into Database")
+	try:
+		print("Enter which entity you want to count: Press 1 for Employees, 2 for cities(locations), 3 for customers")
+		x = int(input())
+		if (x==1):
+			query="SELECT COUNT(emp_id),city_of_work FROM EMPLOYEE GROUP BY city_of_work"
+		elif (x==2):
+			query="SELECT COUNT(cityname) FROM LOCATION"
+		elif (x==3):
+			query="SELECT COUNT(BOOKS.cust_id),EVENT.city FROM BOOKS INNER JOIN EVENT ON BOOKS.event_id=EVENT.event_id GROUP BY EVENT.city"
 
-    except Exception as e:
-        con.rollback()
-        print("Failed to insert into database")
-        print(">>>>>>>>>>>>>", e)
+		cur.execute(query)
+		for row in cur:
+			print(row)
 
-    return
+	except Exception as e:
+		con.rollback()
+		print("Failed to insert into database")
+		print(">>>>>>>>>>>>>", e)
+
+	return;
 
 
 def dispatch(ch):
@@ -107,6 +91,8 @@ def dispatch(ch):
         option3()
     elif(ch == 4):
         option4()
+    elif(ch == 5):
+    	option5()
     else:
         print("Error: Invalid Option")
 
@@ -144,10 +130,10 @@ while(1):
                 print("2. Option 2")  # Fire an Employee
                 print("3. Display employees for a given city") 
                 print("4. Option 4")  # Employee Statistics
-                print("5. Logout")
+                print("5. OPTION 5")
                 ch = int(input("Enter choice> "))
                 tmp = sp.call('clear', shell=True)
-                if ch == 5:
+                if ch >= 6:
                     break
                 else:
                     dispatch(ch)
