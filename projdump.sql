@@ -159,6 +159,7 @@ CREATE TABLE `EMPLOYEE` (
   `doj` date NOT NULL,
   `salary` decimal(15,2) DEFAULT NULL,
   `city_of_work` varchar(40) DEFAULT NULL,
+  `contact` varchar(30) NOT NULL,
   PRIMARY KEY (`emp_id`),
   KEY `city_of_work` (`city_of_work`),
   CONSTRAINT `EMPLOYEE_ibfk_1` FOREIGN KEY (`city_of_work`) REFERENCES `LOCATION` (`cityname`)
