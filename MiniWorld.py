@@ -7,7 +7,21 @@ def option2():
     """
     Function to implement option 1
     """
-    print("Not implemented")
+    try:
+        cityinput=input()
+
+        query="SELECT AVG(amount) FROM PAYMENT WHERE booking_id IN (SELECT booking_id FROM EVENT WHERE city='%s')" % (cityinput)
+        print(query)
+        cur.execute(query)
+        for row in cur:
+            print(row)
+
+    except Exception as e:
+        con.rollback()
+        print("Failed to insert into database")
+        print(">>>>>>>>>>>>>", e)
+
+    return;
 
 
 def option3():
@@ -111,7 +125,7 @@ while(1):
         con = pymysql.connect(host='localhost',
                               user=username,
                               password=password,
-                              db='dataproj',
+                              db='PROJECT',
                               cursorclass=pymysql.cursors.DictCursor)
         tmp = sp.call('clear', shell=True)
 
