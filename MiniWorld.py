@@ -8,7 +8,7 @@ def option2():
     Function to implement option 1
     """
     try:
-        cityinput = input()
+        cityinput = input("Enter City Name : ")
 
         query = "SELECT AVG(amount) FROM PAYMENT WHERE booking_id IN (SELECT booking_id FROM EVENT WHERE city='%s')" % (
             cityinput)
@@ -110,7 +110,7 @@ def option5():
 
     except Exception as e:
         con.rollback()
-        print("Failed to insert into database")
+        print("Failed to fetch from database")
         print(">>>>>>>>>>>>>", e)
 
         return
@@ -168,7 +168,8 @@ while(1):
                 print("2. Display Average Booking Fee for a city")
                 print("3. Display employees for a given city")
                 print("4. Option 4")  # Employee Statistics
-                print("5. OPTION 5")
+                print("5. Count Entities")
+                print("6. Log out")
                 ch = int(input("Enter choice> "))
                 tmp = sp.call('clear', shell=True)
                 if ch >= 6:
