@@ -3,10 +3,7 @@ import pymysql
 import pymysql.cursors
 
 
-def option2():
-    """
-    Function to implement option 1
-    """
+def avgBookingFees():
     try:
         cityinput = input("Enter City Name : ")
 
@@ -25,11 +22,10 @@ def option2():
     return
 
 
-def option3():
+def lsEmpByCity():
     try:
         # Takes City name as input
-        print("Enter the CityName to search for: ")
-        city = input()
+        city = input("Enter the City name to search for: ")
 
         query = "SELECT * FROM EMPLOYEE WHERE city_of_work='%s'" % city
         print(query)
@@ -40,24 +36,23 @@ def option3():
 
     except Exception as e:
         con.rollback()
-        print("Failed to insert into database")
+        print("Failed to fetch from database")
         print(">>>>>>>>>>>>>", e)
 
 
-def option4():
+def lsAgentByCity():
     try:
         #takes city name as input
-        print("Enter the Cityname you want to search in: ")
-        city = input()
-        query = "SELECT agent_id FROM AGENT WHERE agent_id IN (SELECT emp_id FROM EMPLOYEE WHERE city_of_work='%s')" %(city)
+        city = input("Enter the City name you want to search in: ")
+        query = "SELECT agent_id, fname, lname, bookings_made FROM AGENT, EMPLOYEE WHERE agent_id=emp_id AND city_of_work='%s'" %(city)
         cur.execute(query)
-        print("List of Agents")
+        print("List of Agents in ", city)
         for row in cur:
             print(row)
     
     except Exception as e:
         con.rollback()
-        print("Sorry :( ")
+        print("Failed to retreive values.")
         print(">>>>>>>>>>>>>", e)
 
 
@@ -103,7 +98,7 @@ def makeBooking():
     return
 
 
-def option5():
+def countEntities():
     try:
         print("Enter which entity you want to count: Press 1 for Employees, 2 for cities(locations), 3 for customers")
         x = int(input())
@@ -134,13 +129,13 @@ def dispatch(ch):
     if(ch == 1):
         makeBooking()
     elif(ch == 2):
-        option2()
+        avgBookingFees()
     elif(ch == 3):
-        option3()
+        lsEmpByCity()
     elif(ch == 4):
-        option4()
+        lsAgentByCity()
     elif(ch == 5):
-        option5()
+        countEntities()
     else:
         print("Error: Invalid Option")
 
@@ -173,11 +168,10 @@ while(1):
         with con.cursor() as cur:
             while(1):
                 tmp = sp.call('clear', shell=True)
-                # Here taking example of Employee Mini-world
-                print("1. Make a booking")  # Hire an Employee
+                print("1. Make a booking")
                 print("2. Display Average Booking Fee for a city")
-                print("3. Display employees for a given city")
-                print("4. Option 4")  # Employee Statistics
+                print("3. Display Employees for a given city")
+                print("4. List Agents in a City")
                 print("5. Count Entities")
                 print("6. Log out")
                 ch = int(input("Enter choice> "))
