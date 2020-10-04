@@ -119,6 +119,23 @@ def countEntities():
         print(">>>>>>>>>>>>>", e)
 
         return
+    
+def lsEventBwDates():
+    try:
+        date_start = input("Enter the start date(YYYY-MM-DD): ")
+        date_end = input("Enter the end date(YYYY-MM-DD): ")
+        query = "SELECT event_id,type FROM EVENT WHERE start_datetime >= '%s' AND end_datetime <= '%s'" %(date_start,date_end)
+        cur.execute(query)
+        print("Events in between are: ")
+        for row in cur:
+            print(row)
+        
+
+
+    except Exception as e:
+        con.rollback()
+        print("Failed to reach database :( ")
+        print(">>>>>>>>>>>>>", e)
 
 
 def dispatch(ch):
@@ -136,6 +153,8 @@ def dispatch(ch):
         lsAgentByCity()
     elif(ch == 5):
         countEntities()
+    elif(ch == 6):
+        lsEventBwDates()
     else:
         print("Error: Invalid Option")
 
@@ -173,10 +192,11 @@ while(1):
                 print("3. Display Employees for a given city")
                 print("4. List Agents in a City")
                 print("5. Count Entities")
-                print("6. Log out")
+                print("6. List Events between two Dates")
+                print("7. Log out")
                 ch = int(input("Enter choice> "))
                 tmp = sp.call('clear', shell=True)
-                if ch >= 6:
+                if ch >= 7:
                     break
                 else:
                     dispatch(ch)
