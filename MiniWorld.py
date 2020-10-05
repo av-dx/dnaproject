@@ -4,7 +4,8 @@ import pymysql.cursors
 import texttable
 from texttable import Texttable
 from insertdata import *
-# from modifydata import *
+from modifydata import *
+from searchdata import *
 from deletedata import *
 
 
@@ -27,50 +28,6 @@ def avgBookingFees():
         print(">>>>>>>>>>>>>", e)
 
     return
-
-
-def lsEmpByCity():
-    try:
-        # Takes City name as input
-        city = input("Enter the City name to search for: ")
-
-        query = "SELECT * FROM EMPLOYEE WHERE city_of_work='%s'" % city
-
-        cur.execute(query)
-        print("List of employees in ", city)
-        table = Texttable()
-        table.header(["Emp ID", "Fname", "Lname", "D.O.J.",
-                      "Salary", "City of Work", "Contact"])
-        table.set_cols_dtype(["i", "t", "t", "t", "t", "t", "t"])
-        for row in cur:
-            table.add_row([row['emp_id'], row['fname'], row['lname'],
-                           row['doj'], row['salary'], row['city_of_work'], row['contact']])
-        print(table.draw())
-
-    except Exception as e:
-        con.rollback()
-        print("Failed to fetch from database")
-        print(">>>>>>>>>>>>>", e)
-
-
-def lsAgentByCity():
-    try:
-        # takes city name as input
-        city = input("Enter the City name you want to search in: ")
-        query = "SELECT fname, lname, contact FROM AGENT, EMPLOYEE WHERE agent_id=emp_id AND city_of_work='%s'" % (
-                city)
-        cur.execute(query)
-        print("List of Agents in ", city)
-        table = Texttable()
-        table.header(["Fname", "Lname", "Contact"])
-        table.set_cols_dtype(["t", "t", "t"])
-        for row in cur:
-            table.add_row([row['fname'], row['lname'], row['contact']])
-        print(table.draw())
-    except Exception as e:
-        con.rollback()
-        print("Failed to retreive values.")
-        print(">>>>>>>>>>>>>", e)
 
 
 def makeBooking():
@@ -184,23 +141,6 @@ def countEntities():
         return
 
 
-def lsEventBwDates():
-    try:
-        date_start = input("Enter the start date(YYYY-MM-DD): ")
-        date_end = input("Enter the end date(YYYY-MM-DD): ")
-        query = "SELECT type,name,start_datetime,end_datetime FROM EVENT WHERE start_datetime >= '%s' AND end_datetime <= '%s'" % (
-                date_start, date_end)
-        cur.execute(query)
-        print("Events in between are: ")
-        for row in cur:
-            print(row)
-
-    except Exception as e:
-        con.rollback()
-        print("Failed to reach database :( ")
-        print(">>>>>>>>>>>>>", e)
-
-
 def PartSearch():  # For now its just search on names,if we want we can make it on any column
     print("1. Search for Employees")
     print("2. Search for Events")
@@ -208,136 +148,16 @@ def PartSearch():  # For now its just search on names,if we want we can make it 
     ch = int(input("Enter Choice: "))
     if(ch == 1):
         x = input("Search(name or part of name): ")
-        SearchEmp(x)
+        SearchEmp(x, cur, con)
     elif(ch == 2):
         x = input("Search(name or part of name): ")
-        SearchEvents(x)
+        SearchEvents(x, cur, con)
     elif(ch == 3):
         x = input("Search(name or part of name): ")
-        SearchCust(x)
+        SearchCust(x, cur, con)
     else:
         print("Invalid Option")
     return
-
-
-def SearchEmp(x):
-    try:
-
-        query = "SELECT * FROM EMPLOYEE WHERE fname LIKE '%s' OR lname LIKE '%s'" % (
-            "%"+x+"%", "%"+x+"%")
-        cur.execute(query)
-        table = Texttable()
-        table.header(["Emp ID", "Fname", "Lname", "D.O.J.",
-                      "Salary", "City of Work", "Contact"])
-        table.set_cols_dtype(["i", "t", "t", "t", "t", "t", "t"])
-        for row in cur:
-            table.add_row([row['emp_id'], row['fname'], row['lname'],
-                           row['doj'], row['salary'], row['city_of_work'], row['contact']])
-        print(table.draw())
-    except Exception as e:
-        con.rollback()
-        print("Failed to retreive values.")
-        print(">>>>>>>>>>>>>", e)
-    return
-
-
-def SearchEvents(x):
-    try:
-
-        query = "SELECT * FROM EVENT WHERE name LIKE '%s'" % ("%"+x+"%")
-        cur.execute(query)
-        table = Texttable()
-        table.header(["Event ID", "Start", "End", "Type",
-                      "Name", "City", "Booking ID"])
-        table.set_cols_dtype(["i", "t", "t", "t", "t", "t", "i"])
-        for row in cur:
-            table.add_row([row['event_id'], row['start_datetime'], row['end_datetime'],
-                           row['type'], row['name'], row['city'], row['booking_id']])
-        print(table.draw())
-    except Exception as e:
-        con.rollback()
-        print("Failed to retreive values.")
-        print(">>>>>>>>>>>>>", e)
-    return
-
-def modifyCustomer(cur, con):
-    try:
-        print("Enter the name of Customer: ")
-        name = input()
-        print("Here are the matching records :")
-        SearchCust(name)
-        cust_id = int(
-            input("Enter Customer ID of the record you want to modify : "))
-        cur.execute("SELECT * FROM CUSTOMER WHERE cust_id="+str(cust_id))
-        record = cur.fetchone()
-        if (record is None):
-            print("This Customer ID doesnt exist!")
-            return
-        else:
-            print(
-                "Press enter to accept current value, or type the new value, type NULL to set it to NULL.")
-            fname = input("First Name : "+record['fname']+' --> ')
-            if fname:
-                if (fname == 'NULL'):
-                    record['fname'] = ''
-                else:
-                    record['fname'] = fname
-            lname = input("Last Name : "+record['lname']+' --> ')
-            if lname:
-                if (lname == 'NULL'):
-                    record['lname'] = ''
-                else:
-                    record['lname'] = lname
-            poi_type = input("POI Type : "+record['poi_type']+' --> ')
-            if poi_type:
-                if (poi_type == 'NULL'):
-                    record['poi_type'] = ''
-                else:
-                    record['poi_type'] = poi_type
-            poi_number = input(
-                "POI Number : "+record['poi_number']+' --> ')
-            if poi_number:
-                if (poi_number == 'NULL'):
-                    record['poi_number'] = ''
-                else:
-                    record['poi_number'] = poi_number
-            query = "UPDATE CUSTOMER SET fname='%s', lname='%s', poi_type='%s', poi_number='%s' WHERE cust_id='%d'" % (
-                record['fname'], record['lname'], record['poi_type'], record['poi_number'], cust_id)
-            cur.execute(query)
-            con.commit()
-            print("Record updated successfully!")
-    except Exception as e:
-        con.rollback()
-        print("Failed to modify values.")
-        print(">>>>>>>>>>>>>", e)
-
-
-def SearchCust(x):
-    try:
-
-        query = "SELECT * FROM CUSTOMER WHERE fname LIKE '%s' OR lname LIKE '%s'" % (
-            "%"+x+"%", "%"+x+"%")
-        cur.execute(query)
-        table = Texttable()
-        table.header(["Cust ID", "Fname", "Lname", "POI Type",
-                      "POI Number", "Contact"])
-        table.set_cols_dtype(["i", "t", "t", "t", "t", "t"])
-        custs = []
-        for r in cur:
-            custs.append(r)
-        for row in custs:
-            cur.execute("SELECT phone FROM CONTACT WHERE cust_id=" +
-                        str(row['cust_id']))
-            contacts = ""
-            for ph in cur:
-                contacts += ph['phone'] + '\n'
-            table.add_row([row['cust_id'], row['fname'], row['lname'],
-                           row['poi_type'], row['poi_number'], contacts])
-        print(table.draw())
-    except Exception as e:
-        con.rollback()
-        print("Failed to retreive values.")
-        print(">>>>>>>>>>>>>", e)
 
 
 def dispatch(ch):
@@ -350,13 +170,13 @@ def dispatch(ch):
     elif(ch == 2):
         avgBookingFees()
     elif(ch == 3):
-        lsEmpByCity()
+        lsEmpByCity(cur, con)
     elif(ch == 4):
-        lsAgentByCity()
+        lsAgentByCity(cur, con)
     elif(ch == 5):
         countEntities()
     elif(ch == 6):
-        lsEventBwDates()
+        lsEventBwDates(cur, con)
     elif(ch == 7):
         PartSearch()
     elif(ch == 8):
