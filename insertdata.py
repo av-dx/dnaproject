@@ -60,3 +60,58 @@ def insertEvent(cur, con, cust_id):
         print("Failed to insert Event into database")
         print(">>>>>>>>>>>>>", e)
         return None
+
+
+def makeBooking(cur, con):
+    try:
+        # Takes booking details as input
+        row = {}
+        print("Enter new Booking's details: ")
+        print("Does an existing customer booking again or a new customer is availing the service? Press 1 for existing, 2(or any other key) for new customer")
+        x = int(input())
+        if x == 1:
+            row["cust_id"] = int(input("Customer ID: "))
+        else:  # Inserting a new customer in the database, cust id being auto incremented
+            row["cust_id"] = insertCustomer(cur, con)
+            if (row["cust_id"] is None):
+                print("Booking failed")
+                return
+
+        row["agent_id"] = int(input("Agent ID: "))
+        cur.execute(
+            "SELECT fname, lname FROM CUSTOMER WHERE cust_id="+str(row['cust_id']))
+        cust = cur.fetchone()
+        cur.execute(
+            "SELECT fname, lname, bookings_made FROM EMPLOYEE, AGENT WHERE emp_id IN (SELECT agent_id FROM AGENT) AND emp_id="+str(row['agent_id']))
+        agent = cur.fetchone()
+        if (cust is None):
+            print("The customer doesn't exist!")
+            return
+        if (agent is None):
+            print("Agent with that ID doesn't exist")
+            return
+
+        print("Make a booking for Customer :", cust['fname'], cust['lname'],
+              "through Agent :", agent['fname'], agent['lname'], "?", sep=' ')
+        if (input("Y/N : ").lower() == 'y'):
+            ebpair = insertEvent(cur, con, row['cust_id'])
+            if (ebpair is None):
+                print("Booking failed")
+                return
+            row['event_id'] = ebpair[0]
+            row['booking_id'] = ebpair[1]
+            query = "INSERT INTO BOOKS VALUES(%d, %d, %d, %d)" % (
+                    row["event_id"], row["cust_id"], row["agent_id"], row["booking_id"])
+            cur.execute(query)
+            query = "UPDATE AGENT SET bookings_made='%d' WHERE agent_id='%d'" % (
+                    agent['bookings_made']+1, row['agent_id'])
+            cur.execute(query)
+            con.commit()
+            print("Booking Done!")
+        else:
+            print("Booking was cancelled")
+    except Exception as e:
+        con.rollback()
+        print("Failed to insert Booking into database")
+        print(">>>>>>>>>>>>>", e)
+    return
