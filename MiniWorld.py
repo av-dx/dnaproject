@@ -1,6 +1,8 @@
 import subprocess as sp
 import pymysql
 import pymysql.cursors
+from pymysql.constants import CLIENT
+from insertdata import *
 
 
 def avgBookingFees():
@@ -42,14 +44,15 @@ def lsEmpByCity():
 
 def lsAgentByCity():
     try:
-        #takes city name as input
+        # takes city name as input
         city = input("Enter the City name you want to search in: ")
-        query = "SELECT agent_id, fname, lname, bookings_made FROM AGENT, EMPLOYEE WHERE agent_id=emp_id AND city_of_work='%s'" %(city)
+        query = "SELECT agent_id, fname, lname, bookings_made FROM AGENT, EMPLOYEE WHERE agent_id=emp_id AND city_of_work='%s'" % (
+            city)
         cur.execute(query)
         print("List of Agents in ", city)
         for row in cur:
             print(row)
-    
+
     except Exception as e:
         con.rollback()
         print("Failed to retreive values.")
@@ -65,62 +68,45 @@ def makeBooking():
         x = int(input())
         if x == 1:
             row["cust_id"] = int(input("Customer ID: "))
-            cur.execute(
-                "SELECT fname, lname FROM CUSTOMER WHERE cust_id="+str(row['cust_id']))
-            cust = cur.fetchone()
-            if (cust is None):
-                print("The customer doesn't exist!")
+        else:  # Inserting a new customer in the database, cust id being auto incremented
+            row["cust_id"] = insertCustomer(cur, con)
+            if (row["cust_id"] is None):
+                print("Booking failed")
                 return
-        else:#Inserting a new customer in the database, cust id being auto incremented
-            print("Enter new customer details: ")
-            row1 = {}
-            row1['fname'] = input("First Name of the Customer: ")
-            row1['lname'] = input("Last Name of the customer: ")
-            row1['poi_type'] = input("Type of POI: ")
-            row1['poi_number'] = input("POI Number: ")
-            query = "INSERT INTO CUSTOMER(fname,lname,poi_type,poi_number) VALUES ('%s','%s','%s','%s')" % (row1['fname'],row1['lname'],row1['poi_type'],row1['poi_numberi'])
-            cur.execute(query)
-            con.commit()
-            print("The customer is inserted into the database");
-            #How to get cust id of this customer that is to be used in booking?
-
 
         row["agent_id"] = int(input("Agent ID: "))
         cur.execute(
+            "SELECT fname, lname FROM CUSTOMER WHERE cust_id="+str(row['cust_id']))
+        cust = cur.fetchone()
+        cur.execute(
             "SELECT fname, lname FROM EMPLOYEE WHERE emp_id IN (SELECT agent_id FROM AGENT) AND emp_id="+str(row['agent_id']))
         agent = cur.fetchone()
-
+        if (cust is None):
+            print("The customer doesn't exist!")
+            return
         if (agent is None):
             print("Agent with that ID doesn't exist")
-            #do we want to create new agent as well?
             return
-        else:
-            print("Make a booking for Customer :", cust['fname'], cust['lname'],
-                  "through Agent :", agent['fname'], agent['lname'], "?", sep=' ')
-            if (input("Y/N : ").lower() == 'y'):
-                # add EVENT
-                #As new Event being booked, hence the auto increment of event id does its job.
-                print("Enter the Event details: ")
-                row2 = {}
-                row2['start_datetime'] = input("Start date & time(YYYY-MM-DD hh:mm:ss): ")
-                row2['end_datetime'] = input("End date & time(YYYY-MM-DD hh:mm:ss): ")
-                row2['type'] = input("Type of the event(like wedding/birthday,etc): ")
-                row2['name'] = input("Name of the Event: ")
-                row2['city'] = input("City where the event is going to be held: ")
-                #how to get event id from this?
 
-                print("Event will be added after the payment !")
-                # add PAYMENT (BOOKING)
-                print("Booking Done!")
-                query = "INSERT INTO BOOKS VALUES(%d, %d, %d, %d)" % (
-                    row["event_id"], row["cust_id"], row["agent_id"], row["booking_id"])
-                # [TO FIX] the above will fail as EVENT and BOOKING adding arent yet implemented;
-                cur.execute(query)
-                con.commit()
-                print("Inserted Into Database")
+        print("Make a booking for Customer :", cust['fname'], cust['lname'],
+              "through Agent :", agent['fname'], agent['lname'], "?", sep=' ')
+        if (input("Y/N : ").lower() == 'y'):
+            ebpair = insertEvent(cur, con, row['cust_id'])
+            if (ebpair is None):
+                print("Booking failed")
+                return
+            row['event_id'] = ebpair[0]
+            row['booking_id'] = ebpair[1]
+            query = "INSERT INTO BOOKS VALUES(%d, %d, %d, %d)" % (
+                row["event_id"], row["cust_id"], row["agent_id"], row["booking_id"])
+            cur.execute(query)
+            con.commit()
+            print("Booking Done!")
+        else:
+            print("Booking was cancelled")
     except Exception as e:
         con.rollback()
-        print("Failed to insert into database")
+        print("Failed to insert Booking into database")
         print(">>>>>>>>>>>>>", e)
     return
 
@@ -146,18 +132,18 @@ def countEntities():
         print(">>>>>>>>>>>>>", e)
 
         return
-    
+
+
 def lsEventBwDates():
     try:
         date_start = input("Enter the start date(YYYY-MM-DD): ")
         date_end = input("Enter the end date(YYYY-MM-DD): ")
-        query = "SELECT event_id,type FROM EVENT WHERE start_datetime >= '%s' AND end_datetime <= '%s'" %(date_start,date_end)
+        query = "SELECT event_id,type FROM EVENT WHERE start_datetime >= '%s' AND end_datetime <= '%s'" % (
+            date_start, date_end)
         cur.execute(query)
         print("Events in between are: ")
         for row in cur:
             print(row)
-        
-
 
     except Exception as e:
         con.rollback()
@@ -201,7 +187,8 @@ while(1):
                               user=username,
                               password=password,
                               db='caaltd',
-                              cursorclass=pymysql.cursors.DictCursor)
+                              cursorclass=pymysql.cursors.DictCursor,
+                              client_flag=CLIENT.MULTI_STATEMENTS)
         tmp = sp.call('clear', shell=True)
 
         if(con.open):
