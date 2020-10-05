@@ -138,7 +138,7 @@ def lsEventBwDates():
 	try:
 		date_start = input("Enter the start date(YYYY-MM-DD): ")
 		date_end = input("Enter the end date(YYYY-MM-DD): ")
-		query = "SELECT event_id,type FROM EVENT WHERE start_datetime >= '%s' AND end_datetime <= '%s'" % (
+		query = "SELECT type,name,start_datetime,end_datetime FROM EVENT WHERE start_datetime >= '%s' AND end_datetime <= '%s'" % (
 			date_start, date_end)
 		cur.execute(query)
 		print("Events in between are: ")
