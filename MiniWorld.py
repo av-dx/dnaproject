@@ -61,28 +61,55 @@ def makeBooking():
         # Takes booking details as input
         row = {}
         print("Enter new Booking's details: ")
-        row["cust_id"] = int(input("Customer ID: "))
-        row["agent_id"] = int(input("Agent ID: "))
+        print("Does an existing customer booking again or a new customer is availing the service? Press 1 for existing, 2(or any other key) for new customer")
+        x = int(input())
+        if x == 1:
+            row["cust_id"] = int(input("Customer ID: "))
+            cur.execute(
+                "SELECT fname, lname FROM CUSTOMER WHERE cust_id="+str(row['cust_id']))
+            cust = cur.fetchone()
+            if (cust is None):
+                print("The customer doesn't exist!")
+                return
+        else:#Inserting a new customer in the database, cust id being auto incremented
+            print("Enter new customer details: ")
+            row1 = {}
+            row1['fname'] = input("First Name of the Customer: ")
+            row1['lname'] = input("Last Name of the customer: ")
+            row1['poi_type'] = input("Type of POI: ")
+            row1['poi_number'] = input("POI Number: ")
+            query = "INSERT INTO CUSTOMER(fname,lname,poi_type,poi_number) VALUES ('%s','%s','%s','%s')" % (row1['fname'],row1['lname'],row1['poi_type'],row1['poi_numberi'])
+            cur.execute(query)
+            con.commit()
+            print("The customer is inserted into the database");
+            #How to get cust id of this customer that is to be used in booking?
 
-        cur.execute(
-            "SELECT fname, lname FROM CUSTOMER WHERE cust_id="+str(row['cust_id']))
-        cust = cur.fetchone()
+
+        row["agent_id"] = int(input("Agent ID: "))
         cur.execute(
             "SELECT fname, lname FROM EMPLOYEE WHERE emp_id IN (SELECT agent_id FROM AGENT) AND emp_id="+str(row['agent_id']))
         agent = cur.fetchone()
 
-        if (cust is None):
-            print("The customer doesn't exist!")
-            return
-        elif (agent is None):
+        if (agent is None):
             print("Agent with that ID doesn't exist")
+            #do we want to create new agent as well?
             return
         else:
             print("Make a booking for Customer :", cust['fname'], cust['lname'],
                   "through Agent :", agent['fname'], agent['lname'], "?", sep=' ')
             if (input("Y/N : ").lower() == 'y'):
                 # add EVENT
-                print("Event Added!")
+                #As new Event being booked, hence the auto increment of event id does its job.
+                print("Enter the Event details: ")
+                row2 = {}
+                row2['start_datetime'] = input("Start date & time(YYYY-MM-DD hh:mm:ss): ")
+                row2['end_datetime'] = input("End date & time(YYYY-MM-DD hh:mm:ss): ")
+                row2['type'] = input("Type of the event(like wedding/birthday,etc): ")
+                row2['name'] = input("Name of the Event: ")
+                row2['city'] = input("City where the event is going to be held: ")
+                #how to get event id from this?
+
+                print("Event will be added after the payment !")
                 # add PAYMENT (BOOKING)
                 print("Booking Done!")
                 query = "INSERT INTO BOOKS VALUES(%d, %d, %d, %d)" % (
