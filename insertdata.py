@@ -1,3 +1,5 @@
+from searchdata import SearchEvents
+
 def insertCustomer(cur, con):
     try:
         print("Enter new customer details: ")
@@ -181,3 +183,33 @@ def makeBooking(cur, con):
         print("Failed to insert Booking into database")
         print(">>>>>>>>>>>>>", e)
     return
+
+def insertSpecialGuest(cur,con):
+    try:
+        nameofevent = input("Enter the name of the Event: ")
+        print("Here are the matching records: ")
+        SearchEvents(nameofevent,cur,con)
+        required_id = int(input("Enter the event ID for the event: "))
+        query1 = "SELECT * FROM SPECIAL_GUEST WHERE event_id=%d" %(required_id)
+        cur.execute(query1)
+        required_tuple = cur.fetchone()
+        if(required_tuple is None):
+            print("This Event ID doesn't exist! ")
+            return
+        else:
+            row ={}
+            print("Please enter the details of the Special Guest")
+            row['event_id'] = input("Event ID for the event: ")
+            row['name'] = input("Name of the Guest: ")
+            row['occupation'] = input("Occupation of the Guest: ")
+            row['contact'] = input("Contact of the Guest: ")
+            cur.execute("INSERT INTO SPECIAL_GUEST(event_id,name,occupation,contact) VALUES ('%d''%s''%s''%s')" %(row['event_id'],row['name'],row['occupation'],row['contact']))
+            con.commit()
+            print("The Special Guest is registered into the database")
+        return
+    except Exception as e:
+        con.rollback()
+        print("Failed to insert Special Guest ")
+        print(">>>>>>>>>>>>>", e)
+        return None
+
