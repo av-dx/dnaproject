@@ -189,7 +189,7 @@ def insertSpecialGuest(cur,con):
         nameofevent = input("Enter the name of the Event: ")
         print("Here are the matching records: ")
         SearchEvents(nameofevent,cur,con)
-        required_id = input("Enter the event ID for the event: ")
+        required_id = int(input("Enter the event ID for the event: "))
         query1 = "SELECT * FROM SPECIAL_GUEST WHERE event_id=%d" %(required_id)
         cur.execute(query1)
         required_tuple = cur.fetchone()
