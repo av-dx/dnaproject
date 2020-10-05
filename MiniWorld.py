@@ -4,6 +4,8 @@ import pymysql.cursors
 import texttable
 from texttable import Texttable
 from insertdata import *
+from modifydata import *
+from deletedata import *
 
 
 def avgBookingFees():
@@ -123,15 +125,50 @@ def makeBooking():
     return
 
 
+def UpdateData():
+	print("What do you wnat to do: ")
+	print("1. Insert.")
+	print("2. Modify.")
+	print("3. Delete.")
+	x = int(input());
+	if x == 1:
+		print("What do you want to insert?")
+		print("1. Customer")
+		print("2. Contact of Customer")
+		print("3. Location")
+		print("4. Employee")
+		print("5. Reports To")
+		print("6. Payment")#only for existing booking ID as new payment is covered in new booking.
+		print("7. Event")
+		print("8. Special Guest")
+
+	if x == 2:
+		print("What do you want to modify?")
+		print("1. Customer")
+		print("2. Contact of Customer")
+		print("3. Location")
+		print("4. Employee")
+		print("5. Reports To")#both attributes are modifiyable.
+		print("6. Payment")#only for existing booking ID as new payment is covered in new booking.
+		print("7. Event")
+		print("8. Special Guest")
+		y = int(input());
+		if y == 1:
+			modifyCustomer(cur,con);
+
+
+
+
 def countEntities():
     try:
-        print("Enter which entity you want to count: Press 1 for Employees, 2 for cities(locations), 3 for customers")
+        print("Enter which entity you want to count: Press 1 for Employees, 2 for customers")
+        
         x = int(input())
         if (x == 1):
             query = "SELECT COUNT(emp_id),city_of_work FROM EMPLOYEE GROUP BY city_of_work"
+        #elif (x == 2):
+        #    query = "SELECT COUNT(cityname) FROM LOCATION"
         elif (x == 2):
-            query = "SELECT COUNT(cityname) FROM LOCATION"
-        elif (x == 3):
             query = "SELECT COUNT(BOOKS.cust_id),EVENT.city FROM BOOKS INNER JOIN EVENT ON BOOKS.event_id=EVENT.event_id GROUP BY EVENT.city"
 
         cur.execute(query)
@@ -169,19 +206,22 @@ def PartSearch():  # For now its just search on names,if we want we can make it 
     print("3. Search for customers")
     ch = int(input("Enter Choice: "))
     if(ch == 1):
+    	x = input("Search(name or part of name): ")
         SearchEmp()
     elif(ch == 2):
+    	x = input("Search(name or part of name): ")
         SearchEvents()
     elif(ch == 3):
+    	x = input("Search(name or part of name): ")
         SearchCust()
     else:
         print("Invalid Option")
     return
 
 
-def SearchEmp():
+def SearchEmp(x):
     try:
-        x = input("Search(name or part of name): ")
+        
         query = "SELECT * FROM EMPLOYEE WHERE fname LIKE '%s' OR lname LIKE '%s'" % (
             "%"+x+"%", "%"+x+"%")
         cur.execute(query)
@@ -200,9 +240,9 @@ def SearchEmp():
     return
 
 
-def SearchEvents():
+def SearchEvents(x):
     try:
-        x = input("Search(name or part of name): ")
+        
         query = "SELECT * FROM EVENT WHERE name LIKE '%s'" % ("%"+x+"%")
         cur.execute(query)
         table = Texttable()
@@ -220,9 +260,9 @@ def SearchEvents():
     return
 
 
-def SearchCust():
+def SearchCust(x):
     try:
-        x = input("Search(name or part of name): ")
+        
         query = "SELECT * FROM CUSTOMER WHERE fname LIKE '%s' OR lname LIKE '%s'" % (
             "%"+x+"%", "%"+x+"%")
         cur.execute(query)
@@ -265,6 +305,8 @@ def dispatch(ch):
         lsEventBwDates()
     elif(ch == 7):
         PartSearch()
+    elif(ch==8):
+    	UpdateData()
     else:
         print("Error: Invalid Option")
 
@@ -304,10 +346,11 @@ while(1):
                 print("5. Count Entities")
                 print("6. List Events between two Dates")
                 print("7. Search by partial text")
-                print("8. Log out")
+                print("8. Update")
+                print("9. Logout")
                 ch = int(input("Enter choice> "))
                 tmp = sp.call('clear', shell=True)
-                if ch >= 8:
+                if ch >= 9:
                     break
                 else:
                     dispatch(ch)
