@@ -4,7 +4,7 @@ import pymysql.cursors
 import texttable
 from texttable import Texttable
 from insertdata import *
-from modifydata import *
+# from modifydata import *
 from deletedata import *
 
 
@@ -126,47 +126,48 @@ def makeBooking():
 
 
 def UpdateData():
-	print("What do you wnat to do: ")
-	print("1. Insert.")
-	print("2. Modify.")
-	print("3. Delete.")
-	x = int(input());
-	if x == 1:
-		print("What do you want to insert?")
-		print("1. Customer")
-		print("2. Contact of Customer")
-		print("3. Location")
-		print("4. Employee")
-		print("5. Reports To")
-		print("6. Payment")#only for existing booking ID as new payment is covered in new booking.
-		print("7. Event")
-		print("8. Special Guest")
+    print("What do you wnat to do: ")
+    print("1. Insert.")
+    print("2. Modify.")
+    print("3. Delete.")
+    x = int(input())
+    if x == 1:
+        print("What do you want to insert?")
+        print("1. Customer")
+        print("2. Contact of Customer")
+        print("3. Location")
+        print("4. Employee")
+        print("5. Reports To")
+        # only for existing booking ID as new payment is covered in new booking.
+        print("6. Payment")
+        print("7. Event")
+        print("8. Special Guest")
 
-	if x == 2:
-		print("What do you want to modify?")
-		print("1. Customer")
-		print("2. Contact of Customer")
-		print("3. Location")
-		print("4. Employee")
-		print("5. Reports To")#both attributes are modifiyable.
-		print("6. Payment")#only for existing booking ID as new payment is covered in new booking.
-		print("7. Event")
-		print("8. Special Guest")
-		y = int(input());
-		if y == 1:
-			modifyCustomer(cur,con);
-
-
+    if x == 2:
+        print("What do you want to modify?")
+        print("1. Customer")
+        print("2. Contact of Customer")
+        print("3. Location")
+        print("4. Employee")
+        print("5. Reports To")  # both attributes are modifiyable.
+        # only for existing booking ID as new payment is covered in new booking.
+        print("6. Payment")
+        print("7. Event")
+        print("8. Special Guest")
+        y = int(input())
+        if y == 1:
+            modifyCustomer(cur, con)
 
 
 def countEntities():
     try:
-        print("Enter which entity you want to count: Press 1 for Employees, 2 for customers")
-        
+        print(
+            "Enter which entity you want to count: Press 1 for Employees, 2 for customers")
+
         x = int(input())
         if (x == 1):
             query = "SELECT COUNT(emp_id),city_of_work FROM EMPLOYEE GROUP BY city_of_work"
-        #elif (x == 2):
+        # elif (x == 2):
         #    query = "SELECT COUNT(cityname) FROM LOCATION"
         elif (x == 2):
             query = "SELECT COUNT(BOOKS.cust_id),EVENT.city FROM BOOKS INNER JOIN EVENT ON BOOKS.event_id=EVENT.event_id GROUP BY EVENT.city"
@@ -206,14 +207,14 @@ def PartSearch():  # For now its just search on names,if we want we can make it 
     print("3. Search for customers")
     ch = int(input("Enter Choice: "))
     if(ch == 1):
-    	x = input("Search(name or part of name): ")
-        SearchEmp()
+        x = input("Search(name or part of name): ")
+        SearchEmp(x)
     elif(ch == 2):
-    	x = input("Search(name or part of name): ")
-        SearchEvents()
+        x = input("Search(name or part of name): ")
+        SearchEvents(x)
     elif(ch == 3):
-    	x = input("Search(name or part of name): ")
-        SearchCust()
+        x = input("Search(name or part of name): ")
+        SearchCust(x)
     else:
         print("Invalid Option")
     return
@@ -221,7 +222,7 @@ def PartSearch():  # For now its just search on names,if we want we can make it 
 
 def SearchEmp(x):
     try:
-        
+
         query = "SELECT * FROM EMPLOYEE WHERE fname LIKE '%s' OR lname LIKE '%s'" % (
             "%"+x+"%", "%"+x+"%")
         cur.execute(query)
@@ -242,7 +243,7 @@ def SearchEmp(x):
 
 def SearchEvents(x):
     try:
-        
+
         query = "SELECT * FROM EVENT WHERE name LIKE '%s'" % ("%"+x+"%")
         cur.execute(query)
         table = Texttable()
@@ -259,10 +260,61 @@ def SearchEvents(x):
         print(">>>>>>>>>>>>>", e)
     return
 
+def modifyCustomer(cur, con):
+    try:
+        print("Enter the name of Customer: ")
+        name = input()
+        print("Here are the matching records :")
+        SearchCust(name)
+        cust_id = int(
+            input("Enter Customer ID of the record you want to modify : "))
+        cur.execute("SELECT * FROM CUSTOMER WHERE cust_id="+str(cust_id))
+        record = cur.fetchone()
+        if (record is None):
+            print("This Customer ID doesnt exist!")
+            return
+        else:
+            print(
+                "Press enter to accept current value, or type the new value, type NULL to set it to NULL.")
+            fname = input("First Name : "+record['fname']+' --> ')
+            if fname:
+                if (fname == 'NULL'):
+                    record['fname'] = ''
+                else:
+                    record['fname'] = fname
+            lname = input("Last Name : "+record['lname']+' --> ')
+            if lname:
+                if (lname == 'NULL'):
+                    record['lname'] = ''
+                else:
+                    record['lname'] = lname
+            poi_type = input("POI Type : "+record['poi_type']+' --> ')
+            if poi_type:
+                if (poi_type == 'NULL'):
+                    record['poi_type'] = ''
+                else:
+                    record['poi_type'] = poi_type
+            poi_number = input(
+                "POI Number : "+record['poi_number']+' --> ')
+            if poi_number:
+                if (poi_number == 'NULL'):
+                    record['poi_number'] = ''
+                else:
+                    record['poi_number'] = poi_number
+            query = "UPDATE CUSTOMER SET fname='%s', lname='%s', poi_type='%s', poi_number='%s' WHERE cust_id='%d'" % (
+                record['fname'], record['lname'], record['poi_type'], record['poi_number'], cust_id)
+            cur.execute(query)
+            con.commit()
+            print("Record updated successfully!")
+    except Exception as e:
+        con.rollback()
+        print("Failed to modify values.")
+        print(">>>>>>>>>>>>>", e)
+
 
 def SearchCust(x):
     try:
-        
+
         query = "SELECT * FROM CUSTOMER WHERE fname LIKE '%s' OR lname LIKE '%s'" % (
             "%"+x+"%", "%"+x+"%")
         cur.execute(query)
@@ -270,11 +322,14 @@ def SearchCust(x):
         table.header(["Cust ID", "Fname", "Lname", "POI Type",
                       "POI Number", "Contact"])
         table.set_cols_dtype(["i", "t", "t", "t", "t", "t"])
-        for row in cur:
+        custs = []
+        for r in cur:
+            custs.append(r)
+        for row in custs:
             cur.execute("SELECT phone FROM CONTACT WHERE cust_id=" +
                         str(row['cust_id']))
             contacts = ""
-            for ph in cur.fetchall():
+            for ph in cur:
                 contacts += ph['phone'] + '\n'
             table.add_row([row['cust_id'], row['fname'], row['lname'],
                            row['poi_type'], row['poi_number'], contacts])
@@ -283,7 +338,6 @@ def SearchCust(x):
         con.rollback()
         print("Failed to retreive values.")
         print(">>>>>>>>>>>>>", e)
-    return
 
 
 def dispatch(ch):
@@ -305,8 +359,8 @@ def dispatch(ch):
         lsEventBwDates()
     elif(ch == 7):
         PartSearch()
-    elif(ch==8):
-    	UpdateData()
+    elif(ch == 8):
+        UpdateData()
     else:
         print("Error: Invalid Option")
 
