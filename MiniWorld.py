@@ -150,7 +150,7 @@ def lsEventBwDates():
     try:
         date_start = input("Enter the start date(YYYY-MM-DD): ")
         date_end = input("Enter the end date(YYYY-MM-DD): ")
-        query = "SELECT event_id,type FROM EVENT WHERE start_datetime >= '%s' AND end_datetime <= '%s'" % (
+        query = "SELECT type,name,start_datetime,end_datetime FROM EVENT WHERE start_datetime >= '%s' AND end_datetime <= '%s'" % (
                 date_start, date_end)
         cur.execute(query)
         print("Events in between are: ")
@@ -166,7 +166,7 @@ def lsEventBwDates():
 def PartSearch():  # For now its just search on names,if we want we can make it on any column
     print("1. Search for Employees")
     print("2. Search for Events")
-    print("3. Search for Customers")
+    print("3. Search for customers")
     ch = int(input("Enter Choice: "))
     if(ch == 1):
         SearchEmp()
