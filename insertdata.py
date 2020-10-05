@@ -61,6 +61,72 @@ def insertEvent(cur, con, cust_id):
         print(">>>>>>>>>>>>>", e)
         return None
 
+def insertContact(cur,con):
+    cust_id = input("Enter Customer ID: ")
+    while(1):
+        phone = input("Enter Phone details: ")
+        try:
+            query = "INSERT INTO CONTACT VALUES ('%s','%s')" % (cust_id,phone)
+            cur.execute(query)
+            con.commit()
+        except Exception as e:
+            con.rollback()
+            print("Failed to insert Customer into database")
+            print(">>>>>>>>>>>>>", e)
+            break
+        print("do you want to add more contact detail for this customer? (y/n)")
+        if (input().lower() == 'y'):
+            continue
+        else:
+            break
+    return
+
+def insertEmployee(cur,con):
+    try:
+        print("Enter new Employee details: ")
+        row = {}
+        row['fname'] = input("First Name of the Employee: ")
+        row['lname'] = input("Last Name of the Employee: ")
+        row['doj'] = input("Date of joining(YYY-MM-DD): ")
+        row['salary'] = int(input("Salary: "))
+        row['city_of_work'] = input("City of work: ")
+        row['contact'] = input("Contact: ")
+        query = "INSERT INTO EMPLOYEE(fname,lname,doj,salary,city_of_work,contact) VALUES ('%s','%s','%s','%f','%s','%s')" % (
+            row['fname'],row['lname'],row['doj'],row['salary'],row['city_of_work'],row['contact'])
+        cur.execute(query)
+        cur.execute("SELECT LAST_INSERT_ID()")
+        last_id = cur.fetchone()['LAST_INSERT_ID()']
+        con.commit()
+        role = input("What is the role of this employee?(Agent/Manager/Administrator/Technician): ").lower()
+        if role == 'agent':
+            cur.execute(
+                "INSERT INTO AGENT VALUES('%d','%d')" % (last_id,0))
+            con.commit()
+        elif role == 'administrator':
+            qualif = input("Qualfication of the Administrator: ")
+            cur.execute(
+                "INSERT INTO ADMINISTRATOR VALUES('%d','%s')" % (last_id,qualif))
+            con.commit()
+        elif role == 'technician':
+            tlevel = int(input("Tlevel of the Technician: "))
+            cur.execute(
+                "INSERT INTO TECHNICIAN VALUES('%d','%d')" % (last_id,tlevel))
+            con.commit()
+
+        elif role == 'manager':
+            years = int(input("Years of Experience: "))
+            cur.execute(
+                "INSERT INTO MANAGER VALUES('%d','%d')" % (last_id,years))
+            con.commit()
+        else:
+            print("Wrong input try again")
+
+    except Exception as e:
+        con.rollback()
+        print("Failed to insert Customer into database")
+        print(">>>>>>>>>>>>>", e)
+    return
+
 
 def makeBooking(cur, con):
     try:
