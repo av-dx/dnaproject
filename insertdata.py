@@ -146,8 +146,7 @@ def makeBooking(cur, con):
         else:  # Inserting a new customer in the database, cust id being auto incremented
             row["cust_id"] = insertCustomer(cur, con)
             if (row["cust_id"] is None):
-                print("Booking failed")
-                return
+                raise Exception("Booking failed : Customer could not be added")
 
         row["agent_id"] = int(input("Agent ID: "))
         cur.execute(
@@ -157,19 +156,16 @@ def makeBooking(cur, con):
             "SELECT fname, lname, bookings_made FROM EMPLOYEE, AGENT WHERE emp_id IN (SELECT agent_id FROM AGENT) AND emp_id="+str(row['agent_id']))
         agent = cur.fetchone()
         if (cust is None):
-            print("The customer doesn't exist!")
-            return
+            raise Exception("Customer with that ID doesn't exist!")
         if (agent is None):
-            print("Agent with that ID doesn't exist")
-            return
+            raise Exception("Agent with that ID doesn't exist!")
 
         print("Make a booking for Customer :", cust['fname'], cust['lname'],
               "through Agent :", agent['fname'], agent['lname'], "?", sep=' ')
         if (input("Y/N : ").lower() == 'y'):
             ebpair = insertEvent(cur, con, row['cust_id'])
             if (ebpair is None):
-                print("Booking failed")
-                return
+                raise Exception("Booking failed : Event could not be added")
             row['event_id'] = ebpair[0]
             row['booking_id'] = ebpair[1]
             query = "INSERT INTO BOOKS VALUES(%d, %d, %d, %d)" % (
@@ -181,7 +177,7 @@ def makeBooking(cur, con):
             con.commit()
             print("Booking Done!")
         else:
-            print("Booking was cancelled")
+            raise Exception("Booking was cancelled!")
     except Exception as e:
         con.rollback()
         print("Failed to insert Booking into database")

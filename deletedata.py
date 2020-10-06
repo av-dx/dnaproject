@@ -18,6 +18,8 @@ def delContact(cur, con):
         for i, row in enumerate(cur):
             cust.append(row)
             table.add_row([i+1, row['phone']])
+        if len(cust) == 0:
+            raise Exception("This customer has no contacts stored!")
         print(table.draw())
         while (len(todelete) <= len(cust)):
             sno = input(
@@ -46,5 +48,5 @@ def delContact(cur, con):
                 print("Contacts were not deleted.")
     except Exception as e:
         con.rollback()
-        print("Failed to delete contacts into database")
+        print("Failed to delete contacts from database")
         print(">>>>>>>>>>>>>", e)

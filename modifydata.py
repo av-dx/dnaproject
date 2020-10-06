@@ -1,4 +1,5 @@
-from searchdata import SearchCust,SearchEvents
+from searchdata import SearchCust, SearchEvents
+
 
 def modifyCustomer(cur, con):
     try:
@@ -11,8 +12,7 @@ def modifyCustomer(cur, con):
         cur.execute("SELECT * FROM CUSTOMER WHERE cust_id="+str(cust_id))
         record = cur.fetchone()
         if (record is None):
-            print("This Customer ID doesnt exist!")
-            return
+            raise Exception("This Customer ID doesnt exist!")
         else:
             print(
                 "Press enter to accept current value, or type the new value, type NULL to set it to NULL.")
@@ -52,7 +52,7 @@ def modifyCustomer(cur, con):
         print(">>>>>>>>>>>>>", e)
 
 
-def modifyEvent(cur,con):
+def modifyEvent(cur, con):
     try:
         print("Enter the name of Event: ")
         name = input()
@@ -63,18 +63,19 @@ def modifyEvent(cur,con):
         cur.execute("SELECT * FROM EVENT WHERE event_id="+str(event_id))
         record = cur.fetchone()
         if (record is None):
-            print("This Event ID doesnt exist!")
-            return
+            raise Exception("This Event ID doesnt exist!")
         else:
             print(
                 "Press enter to accept current value, or type the new value, type NULL to set it to NULL.")
-            start_datetime = input("Starting of the event : "+str(record['start_datetime'])+' --> ')
+            start_datetime = input(
+                "Starting of the event : "+str(record['start_datetime'])+' --> ')
             if start_datetime:
                 if (start_datetime == 'NULL'):
                     record['start_datetime'] = ''
                 else:
                     record['start_datetime'] = start_datetime
-            end_datetime = input("When does the event end : "+str(record['end_datetime'])+' --> ')
+            end_datetime = input(
+                "When does the event end : "+str(record['end_datetime'])+' --> ')
             if end_datetime:
                 if (end_datetime == 'NULL'):
                     record['end_datetime'] = ''
@@ -99,7 +100,7 @@ def modifyEvent(cur,con):
                     record['city'] = ''
                 else:
                     record['city'] = city
-            
+
             query = "UPDATE EVENT SET start_datetime='%s', end_datetime='%s', type='%s', name='%s', city='%s' WHERE event_id='%d'" % (
                 record['start_datetime'], record['end_datetime'], record['type'], record['name'], record['city'], event_id)
             cur.execute(query)
@@ -109,4 +110,3 @@ def modifyEvent(cur,con):
         con.rollback()
         print("Failed to modify values.")
         print(">>>>>>>>>>>>>", e)
-
