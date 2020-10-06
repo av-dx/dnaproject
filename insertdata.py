@@ -138,13 +138,13 @@ def insertAgent(last_id, cur, con):
 		if (x == 1):
 			manager = input("Enter Manager name: ")
 			print("Here are the matching records :")
-			SearchEmp(manager)
+			SearchEmp(manager, cur, con)
 			mgr_id = int(
 				input("Enter Employee(Manager) ID of the record you want to modify : "))
 			cur.execute("SELECT * FROM MANAGER WHERE mgr_id="+str(mgr_id))
 			record = cur.fetchone()
 			if (record is None):
-				raise Exception("This Manager ID doesnt exist! Create a new manager")
+				print("This Manager ID doesnt exist! Create a new manager")
 				continue
 			else:
 				break
