@@ -116,6 +116,12 @@ def insertEmployee(role, cur, con):
 			con.commit()
 
 		elif role == 4:
+			queryMgr = "SELECT COUNT(city_of_work) FROM EMPLOYEE,MANAGER WHERE city_of_work='%s' AND EMPLOYEE.emp_id=MANAGER.mgr_id" % (row['city_of_work'])
+			cur.execute(queryMgr)
+			if(cur.fetchone()['COUNT(city_of_work)'] == 2):
+				print("There are already two managers to handle '%s'. Try again." % (row['city_of_work']))
+				return
+
 			years = int(input("Years of Experience: "))
 			cur.execute(
 				"INSERT INTO MANAGER VALUES('%d','%d')" % (last_id, years))
