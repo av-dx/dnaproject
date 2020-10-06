@@ -132,7 +132,7 @@ CREATE TABLE `CUSTOMER` (
   `cust_id` int(11) NOT NULL AUTO_INCREMENT,
   `fname` varchar(40) NOT NULL,
   `lname` varchar(40) DEFAULT NULL,
-  `poi_type` varchar(20) NOT NULL,
+  `poi_type` ENUM('Adhaar', 'PAN', 'DL', 'VoterID', 'Passport') NOT NULL,
   `poi_number` varchar(30) NOT NULL,
   PRIMARY KEY (`cust_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
@@ -198,7 +198,8 @@ CREATE TABLE `EVENT` (
   KEY `city` (`city`),
   KEY `booking_id` (`booking_id`),
   CONSTRAINT `EVENT_ibfk_1` FOREIGN KEY (`city`) REFERENCES `LOCATION` (`cityname`),
-  CONSTRAINT `EVENT_ibfk_2` FOREIGN KEY (`booking_id`) REFERENCES `PAYMENT` (`booking_id`)
+  CONSTRAINT `EVENT_ibfk_2` FOREIGN KEY (`booking_id`) REFERENCES `PAYMENT` (`booking_id`),
+  CONSTRAINT `chk_date` CHECK (start_datetime < end_datetime)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
