@@ -123,66 +123,58 @@ def delSpecialGuest(cur, con):
         print("Failed to delete Special Guest")
         print(">>>>>>>>>>>>>", e)
 
-def deleteEmployee(cur,con):
+
+def delEmployee(cur, con):
     try:
         name = input(
             "Search for the Employee name whose contact you want to delete : ")
         SearchEmp(name, cur, con)
         emp_id = int(
             input("Enter the Employee ID who you want to fire(delete) : "))
-        cur.execute(
+        agent = cur.execute(
             "SELECT emp_id,fname, lname, bookings_made FROM EMPLOYEE, AGENT WHERE emp_id IN (SELECT agent_id FROM AGENT) AND emp_id=%d" % (emp_id))
-        agent = cur.fetchone()
-        if(agent is None):
-            cur.execute(
-                "SELECT emp_id,fname, lname, years_of_experience FROM EMPLOYEE, MANAGER WHERE emp_id IN (SELECT mgr_id FROM MANAGER) AND emp_id=%d" % (emp_id))
-            manager = cur.fetchone()
-            if(manager is None):
-                cur.execute(
-                    "SELECT emp_id,fname, lname, qualification FROM EMPLOYEE, ADMINISTRATOR WHERE emp_id IN (SELECT admin_id FROM ADMINISTRATOR) AND emp_id=%d" % (emp_id))
-                admin = cur.fetchone()
-                if(admin is None):
-                    cur.execute(
-                        "SELECT emp_id,fname, lname, tlevel FROM EMPLOYEE, TECHNICIAN WHERE emp_id IN (SELECT tech_id FROM TECHNICIAN) AND emp_id=%d" % (emp_id))
-                    technician = cur.fetchone()
-                    if(technician is None):
-                        print("Employee with given id does not exist")
-                        return
-                    else:
-                        if(input("Are you sure you want to delete data of this Employee(Technician)?(y/n): ").lower() == 'n'):
-                            print("Deletion failed!")
-                else:
-                    if(input("Are you sure you want to delete data of this Employee(Administrator)?(y/n): ").lower() == 'n'):
-                        print("Deletion failed!")
-            else:
-                if(input("Are you sure you want to delete data of this Employee(Manager)?(y/n): ").lower() == 'n'):
-                    print("Deletion failed!")
-        else:
-            if(input("Are you sure you want to delete data of this Employee(Agent)?(y/n): ").lower() == 'n'):
-                print("Deletion failed!")
+        manager = cur.execute(
+            "SELECT emp_id,fname, lname, years_of_experience FROM EMPLOYEE, MANAGER WHERE emp_id IN (SELECT mgr_id FROM MANAGER) AND emp_id=%d" % (emp_id))
+        admin = cur.execute(
+            "SELECT emp_id,fname, lname, qualification FROM EMPLOYEE, ADMINISTRATOR WHERE emp_id IN (SELECT admin_id FROM ADMINISTRATOR) AND emp_id=%d" % (emp_id))
+        tech = cur.execute(
+            "SELECT emp_id,fname, lname, tlevel FROM EMPLOYEE, TECHNICIAN WHERE emp_id IN (SELECT tech_id FROM TECHNICIAN) AND emp_id=%d" % (emp_id))
 
-        query = "DELETE FROM REPORTS_TO WHERE agent_id=%d OR mgr_id=%d" % (emp_id,emp_id)
-        cur.execute(query)
-        con.commit()
-        query = "DELETE FROM AGENT WHERE agent_id=%d" % (emp_id)
-        cur.execute(query)
-        con.commit()
-        query = "DELETE FROM MANAGER WHERE mgr_id=%d" % (emp_id)
-        cur.execute(query)
-        con.commit()
-        query = "DELETE FROM ADMINISTRATOR WHERE admin_id=%d" % (emp_id)
-        cur.execute(query)
-        con.commit()
-        query = "DELETE FROM TECHNICIAN WHERE tech_id=%d" % (emp_id)
-        cur.execute(query)
-        con.commit()
-        query = "DELETE FROM EMPLOYEE WHERE emp_id=%d" % (emp_id)
-        cur.execute(query)
-        con.commit()
-        print("Deletion Successful")
+        print ("Currently this employee is a", end=' ')
+        if(tech > 0 ):
+            print("Technician",end=',')
+        if(admin > 0 ):
+            print("Administrator",end=',')
+        if(manager > 0 ):
+            print("Manager",end=',')
+        if(agent > 0 ):
+            print("Agent",end=',')
+
+        if (input("Do you wish to delete this Employee (y/N) ?").lower() == 'y'):
+            query = "DELETE FROM REPORTS_TO WHERE agent_id=%d OR mgr_id=%d" % (emp_id,emp_id)
+            cur.execute(query)
+            con.commit()
+            query = "DELETE FROM AGENT WHERE agent_id=%d" % (emp_id)
+            cur.execute(query)
+            con.commit()
+            query = "DELETE FROM MANAGER WHERE mgr_id=%d" % (emp_id)
+            cur.execute(query)
+            con.commit()
+            query = "DELETE FROM ADMINISTRATOR WHERE admin_id=%d" % (emp_id)
+            cur.execute(query)
+            con.commit()
+            query = "DELETE FROM TECHNICIAN WHERE tech_id=%d" % (emp_id)
+            cur.execute(query)
+            con.commit()
+            query = "DELETE FROM EMPLOYEE WHERE emp_id=%d" % (emp_id)
+            cur.execute(query)
+            con.commit()
+            print("Deletion Successful")
+        else:
+            raise Exception("Deletion was cancelled!")
     except Exception as e:
         con.rollback()
-        print("Failed to delete employees into database")
+        print("Failed to delete employees from database")
         print(">>>>>>>>>>>>>", e)
     return
 
