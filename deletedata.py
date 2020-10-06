@@ -50,3 +50,22 @@ def delContact(cur, con):
         con.rollback()
         print("Failed to delete contacts from database")
         print(">>>>>>>>>>>>>", e)
+
+
+def delReportsTo(agent_id, mgr_id, cur, con):
+    try:
+        if (agent_id == 'any') and (mgr_id == 'any'):
+            raise Exception("Invalid arguments to delReportsTo()")
+        elif agent_id == 'any':
+            query = "DELETE FROM REPORTS_TO WHERE mgr_id=%d" % (mgr_id)
+        elif mgr_id == 'any':
+            query = "DELETE FROM REPORTS_TO WHERE agent_id=%d" % (agent_id)
+        else:
+            query = "DELETE FROM REPORTS_TO WHERE agent_id=%d AND mgr_id=%d" % (
+                agent_id, mgr_id)
+        cur.execute(query)
+        con.commit()
+    except Exception as e:
+        con.rollback()
+        print("Failed to delete reports_to record from database")
+        print(">>>>>>>>>>>>>", e)
