@@ -53,9 +53,13 @@ def lsEventBwDates(cur, con):
                 date_start, date_end)
         cur.execute(query)
         print("Events in between are: ")
+        table = Texttable()
+        table.header(["Type", "Name", "Start", "End"])
+        table.set_cols_dtype(["t", "t", "t", "t"])
         for row in cur:
-            print(row)
-
+            table.add_row([row['type'], row['name'],
+                           row['start_datetime'], row['end_datetime']])
+        print(table.draw())
     except Exception as e:
         con.rollback()
         print("Failed to reach database :( ")
