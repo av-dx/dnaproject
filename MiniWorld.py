@@ -7,11 +7,12 @@ from insertdata import *
 from modifydata import *
 from searchdata import *
 from deletedata import *
+from sanitize import *
 
 
 def avgBookingFees():
     try:
-        cityinput = input("Enter City Name : ")
+        cityinput = sanitizeText(input("Enter City Name : "))
 
         query = "SELECT AVG(amount) FROM PAYMENT WHERE booking_id IN (SELECT booking_id FROM EVENT WHERE city='%s')" % (
                 cityinput)
@@ -95,13 +96,13 @@ def PartSearch():  # For now its just search on names,if we want we can make it 
     print("3. Search for customers")
     ch = int(input("Enter Choice: "))
     if(ch == 1):
-        x = input("Search(name or part of name): ")
+        x = sanitizeText(input("Search(name or part of name): "))
         SearchEmp(x, cur, con)
     elif(ch == 2):
-        x = input("Search(name or part of name): ")
+        x = sanitizeText(input("Search(name or part of name): "))
         SearchEvents(x, cur, con)
     elif(ch == 3):
-        x = input("Search(name or part of name): ")
+        x = sanitizeText(input("Search(name or part of name): "))
         SearchCust(x, cur, con)
     else:
         print("Invalid Option")
@@ -168,14 +169,14 @@ def searchMenu():
     if(ch == 1):
         lsAgentByCity(cur, con)
     elif(ch == 2):
-        name = input("Enter name to search for : ")
+        name = sanitizeText(input("Enter name to search for : "))
         SearchEmp(name, cur, con)
     elif(ch == 3):
         lsEmpByCity(cur, con)
     elif(ch == 4):
         lsEventBwDates(cur, con)
     elif(ch == 5):
-        name = input("Enter name to search for : ")
+        name = sanitizeText(input("Enter name to search for : "))
         SearchCust(name, cur, con)
     else:
         return
