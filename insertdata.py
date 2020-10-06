@@ -42,7 +42,7 @@ def insertEvent(cur, con, cust_id):
         print("Enter payment details : ")
         row1 = {}
         row1['transdate'] = input(
-            "Start date & time(YYYY-MM-DD hh:mm:ss): ")
+            "Transaction date & time(YYYY-MM-DD hh:mm:ss): ")
         row1['amount'] = float(input(
             "Amount : "))
         row1['cust_id'] = cust_id
