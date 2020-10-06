@@ -140,32 +140,28 @@ def delEmployee(cur, con):
         tech = cur.execute(
             "SELECT emp_id,fname, lname, tlevel FROM EMPLOYEE, TECHNICIAN WHERE emp_id IN (SELECT tech_id FROM TECHNICIAN) AND emp_id=%d" % (emp_id))
 
-        print ("Currently this employee is a", end=' ')
-        if(tech > 0 ):
-            print("Technician",end=',')
-        if(admin > 0 ):
-            print("Administrator",end=',')
-        if(manager > 0 ):
-            print("Manager",end=',')
-        if(agent > 0 ):
-            print("Agent",end=',')
+        print("Currently this employee is a", end=' ')
+        if(tech > 0):
+            print("Technician")
+        if(admin > 0):
+            print("Administrator")
+        if(manager > 0):
+            print("Manager")
+        if(agent > 0):
+            print("Agent")
 
         if (input("Do you wish to delete this Employee (y/N) ?").lower() == 'y'):
-            query = "DELETE FROM REPORTS_TO WHERE agent_id=%d OR mgr_id=%d" % (emp_id,emp_id)
+            query = "DELETE FROM REPORTS_TO WHERE agent_id=%d OR mgr_id=%d" % (
+                emp_id, emp_id)
             cur.execute(query)
-            con.commit()
             query = "DELETE FROM AGENT WHERE agent_id=%d" % (emp_id)
             cur.execute(query)
-            con.commit()
             query = "DELETE FROM MANAGER WHERE mgr_id=%d" % (emp_id)
             cur.execute(query)
-            con.commit()
             query = "DELETE FROM ADMINISTRATOR WHERE admin_id=%d" % (emp_id)
             cur.execute(query)
-            con.commit()
             query = "DELETE FROM TECHNICIAN WHERE tech_id=%d" % (emp_id)
             cur.execute(query)
-            con.commit()
             query = "DELETE FROM EMPLOYEE WHERE emp_id=%d" % (emp_id)
             cur.execute(query)
             con.commit()
@@ -177,4 +173,3 @@ def delEmployee(cur, con):
         print("Failed to delete employees from database")
         print(">>>>>>>>>>>>>", e)
     return
-
