@@ -1,4 +1,4 @@
-from searchdata import SearchCust, SearchEvents
+from searchdata import SearchCust, SearchEvents, SearchEmp
 
 
 def modifyCustomer(cur, con):
@@ -103,6 +103,69 @@ def modifyEvent(cur, con):
 
             query = "UPDATE EVENT SET start_datetime='%s', end_datetime='%s', type='%s', name='%s', city='%s' WHERE event_id='%d'" % (
                 record['start_datetime'], record['end_datetime'], record['type'], record['name'], record['city'], event_id)
+            cur.execute(query)
+            con.commit()
+            print("Record updated successfully!")
+    except Exception as e:
+        con.rollback()
+        print("Failed to modify values.")
+        print(">>>>>>>>>>>>>", e)
+
+
+def modifyEmployee(cur, con):
+    try:
+        print("Enter the name of Employee: ")
+        name = input()
+        print("Here are the matching records :")
+        SearchEmp(name, cur, con)
+        emp_id = int(
+            input("Enter Employee ID of the record you want to modify : "))
+        cur.execute("SELECT * FROM EMPLOYEE WHERE emp_id="+str(emp_id))
+        record = cur.fetchone()
+        if (record is None):
+            raise Exception("This Employee ID doesnt exist!")
+        else:
+            print(
+                "Press enter to accept current value, or type the new value, type NULL to set it to NULL.")
+            fname = input("First Name : "+str(record['fname'])+' --> ')
+            if fname:
+                if (fname == 'NULL'):
+                    record['fname'] = ''
+                else:
+                    record['fname'] = fname
+            lname = input("Last Name : "+str(record['lname'])+' --> ')
+            if lname:
+                if (lname == 'NULL'):
+                    record['lname'] = ''
+                else:
+                    record['lname'] = lname
+            doj = input("Date of Joiningt: "+ str(record['doj'])+' --> ')
+            if doj:
+                if (doj == 'NULL'):
+                    record['doj'] = ''
+                else:
+                    record['doj'] = doj
+            salary = input("Salary : "+str(record['salary'])+' --> ')
+            if salary:
+                if (salary == 'NULL'):
+                    record['salary'] = 0
+                else:
+                    record['salary'] = float(salary)
+            city_of_work = input("City: "+record['city_of_work']+' --> ')
+            if city_of_work:
+                if (city_of_work == 'NULL'):
+                    record['city_of_work'] = ''
+                else:
+                    record['city_of_work'] = city_of_work
+            contact = input("Contact: "+record['contact']+' --> ')
+            if contact:
+                if (contact == 'NULL'):
+                    record['contact'] = ''
+                else:
+                    record['contact'] = contact
+
+            query = "UPDATE EMPLOYEE SET fname='%s', lname='%s', doj='%s', salary='%f', city_of_work='%s', contact='%s' WHERE emp_id='%d'" % (
+                record['fname'], record['lname'], record['doj'], record['salary'], record['city_of_work'], record['contact'], emp_id)
             cur.execute(query)
             con.commit()
             print("Record updated successfully!")

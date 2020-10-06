@@ -184,13 +184,16 @@ def searchMenu():
 def updateMenu():
     print("1. Update a Customer record")
     print("2. Update an Event record")
-    print("3. Back")
+    print("3. Update an Employee record")
+    print("4. Back")
     ch = int(input("Enter choice> "))
     sp.call('clear', shell=True)
     if(ch == 1):
         modifyCustomer(cur, con)
     elif(ch == 2):
         modifyEvent(cur, con)
+    elif(ch == 3):
+        modifyEmployee(cur, con)
     else:
         return
 
@@ -232,25 +235,28 @@ while(1):
     password = input("Password: ")
 
     try:
-        con = pymysql.connect(host='localhost',
-                              user=username,
-                              password=password,
-                              db='caaltd',
-                              cursorclass=pymysql.cursors.DictCursor)
-        tmp = sp.call('clear', shell=True)
-
+        if username == "customer":
+            adminMode = 0
+            con = pymysql.connect(host='localhost',
+                                  user="customer",
+                                  password="customer#caaltd",
+                                  db='caaltd',
+                                  cursorclass=pymysql.cursors.DictCursor)
+            tmp = sp.call('clear', shell=True)
+            print("Logged in as a customer.")
+        else:
+            adminMode = 1
+            con = pymysql.connect(host='localhost',
+                                  user=username,
+                                  password=password,
+                                  db='caaltd',
+                                  cursorclass=pymysql.cursors.DictCursor)
+            tmp = sp.call('clear', shell=True)
+            print("Logged in as an admin.")
         if(con.open):
             print("Connected")
         else:
             print("Failed to connect")
-
-        if username == "customer":
-            print("Logged in as a customer.")
-            adminMode = 0
-        else:
-            print("Logged in as an admin.")
-            adminMode = 1
-
         input("Enter any key to CONTINUE>")
 
         with con.cursor() as cur:
