@@ -124,7 +124,12 @@ def insertMenu():
     elif(ch == 3):
         insertCustomer(cur, con)
     elif(ch == 4):
-        insertEmployee(cur, con)
+        print("1. Agent")
+        print("2. Administrator")
+        print("3. Technician")
+        print("4. Manager")
+        role = int(input())
+        insertEmployee(role, cur, con)
     elif(ch == 5):
         insertSpecialGuest(cur, con)
     else:

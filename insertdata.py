@@ -1,4 +1,4 @@
-from searchdata import SearchEvents
+from searchdata import SearchEvents, SearchEmp
 
 
 def insertCustomer(cur, con):
@@ -86,7 +86,7 @@ def insertContact(cur, con):
     return
 
 
-def insertEmployee(cur, con):
+def insertEmployee(role, cur, con):
     try:
         print("Enter new Employee details: ")
         row = {}
@@ -102,24 +102,42 @@ def insertEmployee(cur, con):
         cur.execute("SELECT LAST_INSERT_ID()")
         last_id = cur.fetchone()['LAST_INSERT_ID()']
         con.commit()
-        role = input(
-            "What is the role of this employee?(Agent/Manager/Administrator/Technician): ").lower()
-        if role == 'agent':
+        if role == 1:
             cur.execute(
                 "INSERT INTO AGENT VALUES('%d','%d')" % (last_id, 0))
+            while(1):
+                x = input("To what manager does this agent report to?: Press 1 for existing Manager, 2 for new Manager ")
+                if (x == 1):
+                    manager = input("Enter Manager name: ")
+                    print("Here are the matching records :")
+                    SearchEmp(manager)
+                    mgr_id = int(
+                        input("Enter Employee(Manager) ID of the record you want to modify : "))
+                    cur.execute("SELECT * FROM MANAGER WHERE mgr_id="+str(mgr_id))
+                    record = cur.fetchone()
+                    if (record is None):
+                        raise Exception("This Manager ID doesnt exist! Create a new manager")
+                        continue
+                    else:
+                        break
+                elif (x == 2):
+                    print("Enter the new Manager details: ")
+                    mgr_id = insertEmployee(4,cur,con)
+                    break
+            insertReportsTo(last_id,mgr_id,cur,con)
             con.commit()
-        elif role == 'administrator':
+        elif role == 2:
             qualif = input("Qualfication of the Administrator: ")
             cur.execute(
                 "INSERT INTO ADMINISTRATOR VALUES('%d','%s')" % (last_id, qualif))
             con.commit()
-        elif role == 'technician':
+        elif role == 3:
             tlevel = int(input("Tlevel of the Technician: "))
             cur.execute(
                 "INSERT INTO TECHNICIAN VALUES('%d','%d')" % (last_id, tlevel))
             con.commit()
 
-        elif role == 'manager':
+        elif role == 4:
             years = int(input("Years of Experience: "))
             cur.execute(
                 "INSERT INTO MANAGER VALUES('%d','%d')" % (last_id, years))
@@ -131,7 +149,7 @@ def insertEmployee(cur, con):
         con.rollback()
         print("Failed to insert Customer into database")
         print(">>>>>>>>>>>>>", e)
-    return
+    return last_id
 
 
 def makeBooking(cur, con):
