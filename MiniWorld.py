@@ -142,7 +142,7 @@ def insertMenu():
 def deleteMenu():
     print("1. Delete Customer Contacts")
     print("2. Delete Special Guest for an Event")
-    print("3. Delete Special Guest for an Event")
+    print("3. Delete Employee")
     print("4. Back")
     ch = int(input("Enter choice> "))
     sp.call('clear', shell=True)
