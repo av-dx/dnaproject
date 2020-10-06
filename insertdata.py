@@ -228,6 +228,12 @@ def insertSpecialGuest(cur, con):
 			print("This Event ID doesn't exist! ")
 			return
 		else:
+			querySPG = "SELECT COUNT(event_id) FROM SPECIAL_GUEST WHERE event_id='%d'" % (required_id)
+			cur.execute(querySPG)
+			if(cur.fetchone()['COUNT(event_id)'] == 3):
+				print("There are already three special guests visiting this event. Try again.")
+				return
+
 			row = {}
 			print("Please enter the details of the Special Guest")
 			row['event_id'] = input("Event ID for the event: ")
