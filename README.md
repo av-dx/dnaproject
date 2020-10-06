@@ -13,9 +13,9 @@
  Steps to use: 
 * Download or Clone the repo into your local system.
 * The folder contains an .sql file and 4 .py files which are for different types of queries.
-* Download texttable from pip. We have used this library just for printing tables. USE [pip3 install texttable] in the terminal].
+* Download texttable from pip. We have used this library just for printing tables. USE [pip3 install texttable] in the terminal.
 * Create a database named 'caaltd'(without quotes)
-* Import the sql file into your mysql local system. USE [mysql -u <username> -p caaltd < caaltd.sql] in terminal].
+* Import the sql file into your mysql local system. USE [mysql -u <username> -p caaltd < caaltd.sql] in terminal.
 * Run the Miniworld.py file in python3 in the terminal.
 * You will be welcomed by a CLI(Command-Line-Interface) in which you can access the database as a customer or an administrator/    admin.
   * If you are a customer -> enter the username as 'customer'(without quotes). Customer has to be added by system root and will have limited privileges restricted to searching and viewing.
