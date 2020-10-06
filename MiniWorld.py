@@ -129,6 +129,9 @@ def insertMenu():
         print("3. Technician")
         print("4. Manager")
         role = int(input())
+        if ((role < 1) or (role > 4)):
+            print("Wrong input try again!")
+            return
         insertEmployee(role, cur, con)
     elif(ch == 5):
         insertSpecialGuest(cur, con)
