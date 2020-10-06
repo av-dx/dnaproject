@@ -1,13 +1,13 @@
--- MariaDB dump 10.17  Distrib 10.5.5-MariaDB, for Linux (x86_64)
+-- MySQL dump 10.13  Distrib 5.7.31, for Linux (x86_64)
 --
 -- Host: localhost    Database: caaltd
 -- ------------------------------------------------------
--- Server version	10.5.5-MariaDB
+-- Server version	5.7.31-0ubuntu0.18.04.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
+/*!40101 SET NAMES utf8 */;
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
@@ -118,6 +118,7 @@ CREATE TABLE `CONTACT` (
 
 LOCK TABLES `CONTACT` WRITE;
 /*!40000 ALTER TABLE `CONTACT` DISABLE KEYS */;
+INSERT INTO `CONTACT` VALUES (1,'+919949851263'),(1,'03325347896'),(2,'6340527819'),(3,'01126594007'),(4,'09046025178'),(5,'+12645781254');
 /*!40000 ALTER TABLE `CONTACT` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -132,10 +133,10 @@ CREATE TABLE `CUSTOMER` (
   `cust_id` int(11) NOT NULL AUTO_INCREMENT,
   `fname` varchar(40) NOT NULL,
   `lname` varchar(40) DEFAULT NULL,
-  `poi_type` ENUM('Adhaar', 'PAN', 'DL', 'VoterID', 'Passport') NOT NULL,
+  `poi_type` enum('Adhaar','PAN','DL','VoterID','Passport') NOT NULL,
   `poi_number` varchar(30) NOT NULL,
   PRIMARY KEY (`cust_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -144,7 +145,7 @@ CREATE TABLE `CUSTOMER` (
 
 LOCK TABLES `CUSTOMER` WRITE;
 /*!40000 ALTER TABLE `CUSTOMER` DISABLE KEYS */;
-INSERT INTO `CUSTOMER` VALUES (1,'Rajesh','Agarwal','Adhaar','1098 1099 1100'),(2,'Raj','Dwivedi','Adhaar','5432 6541 1234'),(3,'Chingari','Lal','DL','KL4324252');
+INSERT INTO `CUSTOMER` VALUES (1,'Rajesh','Agarwal','Adhaar','1098 1099 1100'),(2,'Raj','Dwivedi','Adhaar','5432 6541 1234'),(3,'Chingari','Lal','DL','KL4324252'),(4,'Suman','Vyas','VoterID','ABC1234567'),(5,'Anushka','Shetty','PAN','JHWPS5891A'),(6,'Anushka','Das','PAN','WIKPD7412D');
 /*!40000 ALTER TABLE `CUSTOMER` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -198,8 +199,7 @@ CREATE TABLE `EVENT` (
   KEY `city` (`city`),
   KEY `booking_id` (`booking_id`),
   CONSTRAINT `EVENT_ibfk_1` FOREIGN KEY (`city`) REFERENCES `LOCATION` (`cityname`),
-  CONSTRAINT `EVENT_ibfk_2` FOREIGN KEY (`booking_id`) REFERENCES `PAYMENT` (`booking_id`),
-  CONSTRAINT `chk_date` CHECK (start_datetime < end_datetime)
+  CONSTRAINT `EVENT_ibfk_2` FOREIGN KEY (`booking_id`) REFERENCES `PAYMENT` (`booking_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -312,7 +312,7 @@ CREATE TABLE `REPORTS_TO` (
 
 LOCK TABLES `REPORTS_TO` WRITE;
 /*!40000 ALTER TABLE `REPORTS_TO` DISABLE KEYS */;
-INSERT INTO `REPORTS_TO` VALUES (6,6),(8,8),(13,4),(13,8);
+INSERT INTO `REPORTS_TO` VALUES (13,4),(6,6),(8,8),(13,8);
 /*!40000 ALTER TABLE `REPORTS_TO` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -376,4 +376,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-10-05 18:52:58
+-- Dump completed on 2020-10-06 17:34:38
