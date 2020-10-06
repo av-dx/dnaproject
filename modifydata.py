@@ -1,5 +1,5 @@
 from searchdata import SearchCust, SearchEvents, SearchEmp
-
+from insertdata import insertAgent
 
 def modifyCustomer(cur, con):
     try:
@@ -139,7 +139,7 @@ def modifyEmployee(cur, con):
                     record['lname'] = ''
                 else:
                     record['lname'] = lname
-            doj = input("Date of Joiningt: "+ str(record['doj'])+' --> ')
+            doj = input("Date of Joining: " + str(record['doj'])+' --> ')
             if doj:
                 if (doj == 'NULL'):
                     record['doj'] = ''
@@ -167,6 +167,68 @@ def modifyEmployee(cur, con):
             query = "UPDATE EMPLOYEE SET fname='%s', lname='%s', doj='%s', salary='%f', city_of_work='%s', contact='%s' WHERE emp_id='%d'" % (
                 record['fname'], record['lname'], record['doj'], record['salary'], record['city_of_work'], record['contact'], emp_id)
             cur.execute(query)
+
+            # Change Roles
+            agent = cur.execute(
+                "SELECT emp_id,fname, lname, bookings_made FROM EMPLOYEE, AGENT WHERE emp_id IN (SELECT agent_id FROM AGENT) AND emp_id=%d" % (emp_id))
+            manager = cur.execute(
+                "SELECT emp_id,fname, lname, years_of_experience FROM EMPLOYEE, MANAGER WHERE emp_id IN (SELECT mgr_id FROM MANAGER) AND emp_id=%d" % (emp_id))
+            admin = cur.execute(
+                "SELECT emp_id,fname, lname, qualification FROM EMPLOYEE, ADMINISTRATOR WHERE emp_id IN (SELECT admin_id FROM ADMINISTRATOR) AND emp_id=%d" % (emp_id))
+            tech = cur.execute(
+                "SELECT emp_id,fname, lname, tlevel FROM EMPLOYEE, TECHNICIAN WHERE emp_id IN (SELECT tech_id FROM TECHNICIAN) AND emp_id=%d" % (emp_id))
+
+            print("Currently this employee is a", end=' ')
+            if(tech > 0):
+                print("Technician")
+                role = 3
+            if(admin > 0):
+                print("Administrator")
+                role = 2
+            if(manager > 0):
+                print("Manager")
+                role = 4
+            if(agent > 0):
+                print("Agent")
+                role = 1
+
+            while(1):
+                print("What role do you want to assign to this employee ?")
+                print("1. Agent")
+                print("2. Administrator")
+                print("3. Technician")
+                print("4. Manager")
+                newrole = int(input())
+                if ((newrole < 1) or (newrole > 4)):
+                    print("Wrong input try again!")
+                    continue
+                else:
+                    break
+
+            if (newrole != role):
+                cur.execute("DELETE FROM REPORTS_TO WHERE agent_id=%d OR mgr_id=%d" % (
+                    emp_id, emp_id))
+                cur.execute("DELETE FROM AGENT WHERE agent_id=%d" % (emp_id))
+                cur.execute("DELETE FROM MANAGER WHERE mgr_id=%d" % (emp_id))
+                cur.execute("DELETE FROM ADMINISTRATOR WHERE admin_id=%d" % (
+                    emp_id))
+                cur.execute(
+                    "DELETE FROM TECHNICIAN WHERE tech_id=%d" % (emp_id))
+
+                if (newrole == 1):
+                    insertAgent(emp_id, cur, con)
+                elif (newrole == 2):
+                    qualification = input("Enter the qualification : ")
+                    cur.execute("INSERT INTO ADMINISTRATOR VALUES (%d,'%s')" % (
+                        emp_id, qualification))
+                elif (newrole == 3):
+                    tlevel = int(input("Enter technicians level : "))
+                    cur.execute("INSERT INTO TECHNICIAN VALUES (%d,%d)" %
+                                (emp_id, tlevel))
+                else:
+                    years = int(input("Years of Experience: "))
+                    cur.execute(
+                        "INSERT INTO MANAGER VALUES('%d','%d')" % (emp_id, years))
             con.commit()
             print("Record updated successfully!")
     except Exception as e:
