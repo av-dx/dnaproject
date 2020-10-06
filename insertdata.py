@@ -223,10 +223,16 @@ def insertSpecialGuest(cur, con):
 
 def insertReportsTo(agent_id, mgr_id, cur, con):
     try:
-        agent = cur.execute(
-            "SELECT city_of_work AS city FROM AGENT, EMPLOYEE agent_id=emp_id")
-        mgr = cur.execute(
-            "SELECT city_of_work AS city FROM MANAGER, EMPLOYEE mgr_id=emp_id")
+        cur.execute(
+            "SELECT city_of_work AS city FROM AGENT, EMPLOYEE WHERE agent_id=emp_id AND agent_id=%d" % agent_id)
+        agent = cur.fetchone()
+        cur.execute(
+            "SELECT city_of_work AS city FROM MANAGER, EMPLOYEE WHERE mgr_id=emp_id AND mgr_id=%d" % mgr_id)
+        mgr = cur.fetchone()
+        if (agent is None):
+            raise Exception("Agent with that ID doesnt exist!")
+        if (mgr is None):
+            raise Exception("Manager with that ID doesnt exist!")
         if (agent['city'] == mgr['city']):
             cur.execute("INSERT INTO REPORTS_TO VALUES (%d,%d)" %
                         (agent_id, mgr_id))
