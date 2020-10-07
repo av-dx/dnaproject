@@ -2,6 +2,7 @@ from searchdata import SearchCust, SearchEvents, SearchEmp
 from insertdata import insertAgent
 from sanitize import sanitizeText
 
+
 def modifyCustomer(cur, con):
     try:
         name = sanitizeText(input("Enter the name of Customer: "))
@@ -16,7 +17,8 @@ def modifyCustomer(cur, con):
         else:
             print(
                 "Press enter to accept current value, or type the new value, type NULL to set it to NULL.")
-            fname = sanitizeText(input("First Name : "+record['fname']+' --> '))
+            fname = sanitizeText(
+                input("First Name : "+record['fname']+' --> '))
             if fname:
                 if (fname == 'NULL'):
                     record['fname'] = ''
@@ -28,7 +30,8 @@ def modifyCustomer(cur, con):
                     record['lname'] = ''
                 else:
                     record['lname'] = lname
-            poi_type = sanitizeText(input("POI poi_type : "+record['poi_type']+' --> '))
+            poi_type = sanitizeText(
+                input("POI poi_type : "+record['poi_type']+' --> '))
             if poi_type:
                 if (poi_type == 'NULL'):
                     record['poi_type'] = ''
@@ -80,7 +83,8 @@ def modifyEvent(cur, con):
                     record['end_datetime'] = ''
                 else:
                     record['end_datetime'] = end_datetime
-            eventtype = sanitizeText(input("Type of Event: "+record['type']+' --> '))
+            eventtype = sanitizeText(
+                input("Type of Event: "+record['type']+' --> '))
             if eventtype:
                 if (eventtype == 'NULL'):
                     record['type'] = ''
@@ -125,37 +129,43 @@ def modifyEmployee(cur, con):
         else:
             print(
                 "Press enter to accept current value, or type the new value, type NULL to set it to NULL.")
-            fname = sanitizeText(input("First Name : "+str(record['fname'])+' --> '))
+            fname = sanitizeText(
+                input("First Name : "+str(record['fname'])+' --> '))
             if fname:
                 if (fname == 'NULL'):
                     record['fname'] = ''
                 else:
                     record['fname'] = fname
-            lname = sanitizeText(input("Last Name : "+str(record['lname'])+' --> '))
+            lname = sanitizeText(
+                input("Last Name : "+str(record['lname'])+' --> '))
             if lname:
                 if (lname == 'NULL'):
                     record['lname'] = ''
                 else:
                     record['lname'] = lname
-            doj = sanitizeText(input("Date of Joining: " + str(record['doj'])+' --> '))
+            doj = sanitizeText(
+                input("Date of Joining: " + str(record['doj'])+' --> '))
             if doj:
                 if (doj == 'NULL'):
                     record['doj'] = ''
                 else:
                     record['doj'] = doj
-            salary = sanitizeText(input("Salary : "+str(record['salary'])+' --> '))
+            salary = sanitizeText(
+                input("Salary : "+str(record['salary'])+' --> '))
             if salary:
                 if (salary == 'NULL'):
                     record['salary'] = 0
                 else:
                     record['salary'] = float(salary)
-            city_of_work = sanitizeText(input("City: "+record['city_of_work']+' --> '))
+            city_of_work = sanitizeText(
+                input("City: "+record['city_of_work']+' --> '))
             if city_of_work:
                 if (city_of_work == 'NULL'):
                     record['city_of_work'] = ''
                 else:
                     record['city_of_work'] = city_of_work
-            contact = sanitizeText(input("Contact: "+record['contact']+' --> '))
+            contact = sanitizeText(
+                input("Contact: "+record['contact']+' --> '))
             if contact:
                 if (contact == 'NULL'):
                     record['contact'] = ''
@@ -216,11 +226,13 @@ def modifyEmployee(cur, con):
                 if (newrole == 1):
                     insertAgent(emp_id, cur, con)
                 elif (newrole == 2):
-                    qualification = sanitizeText(input("Enter the qualification : "))
+                    qualification = sanitizeText(
+                        input("Enter the qualification : "))
                     cur.execute("INSERT INTO ADMINISTRATOR VALUES (%d,'%s')" % (
                         emp_id, qualification))
                 elif (newrole == 3):
-                    tlevel = int(sanitizeText(input("Enter technicians level : ")))
+                    tlevel = int(sanitizeText(
+                        input("Enter technicians level : ")))
                     cur.execute("INSERT INTO TECHNICIAN VALUES (%d,%d)" %
                                 (emp_id, tlevel))
                 else:
