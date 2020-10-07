@@ -47,11 +47,11 @@ def lsAgentByCity(cur, con):
         print("Failed to retreive values.")
         print(">>>>>>>>>>>>>", e)
 
+
 def lsManagerByCity(city, cur, con):
     try:
-        # takes city name as input
-        #city = input("Enter the City name you want to search in: ")
-        query = "SELECT emp_id, fname, lname, contact FROM MANAGER, EMPLOYEE WHERE mgr_id=emp_id AND city_of_work='%s'" % (city)
+        query = "SELECT emp_id, fname, lname, contact FROM MANAGER, EMPLOYEE WHERE mgr_id=emp_id AND city_of_work='%s'" % (
+            city)
         cur.execute(query)
         if (cur == 0):
             print("No Managers in the given city.")
@@ -61,7 +61,8 @@ def lsManagerByCity(city, cur, con):
         table.header(["Emp_id", "Fname", "Lname", "Contact"])
         table.set_cols_dtype(["i", "t", "t", "t"])
         for row in cur:
-            table.add_row([row['emp_id'], row['fname'], row['lname'], row['contact']])
+            table.add_row([row['emp_id'], row['fname'],
+                           row['lname'], row['contact']])
         print(table.draw())
     except Exception as e:
         con.rollback()
