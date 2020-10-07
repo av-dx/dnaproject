@@ -208,10 +208,6 @@ def adminMenu(ch):
         searchMenu()
     elif(ch == 4):
         updateMenu()
-    elif(ch == 5):
-        lsAgentByCity(cur, con)
-    elif(ch == 6):
-        lsEventBwDates(cur, con)
     else:
         print("Error: Invalid Option")
 
@@ -236,8 +232,8 @@ while(1):
     print(r"  \____/_/   \_\/_/   \_\    |_____\__\__,_(_)")
     print(r"                                              ")
 
-    username = 'ChayanKochar'
-    password = 'MySqlck1@'
+    username = input("Username: ")
+    password = input("Password: ")
 
     try:
         if username == "customer":
@@ -272,13 +268,11 @@ while(1):
                     print("2. Delete Records")
                     print("3. Search Records")
                     print("4. Update Records")
-                    print("5. Search for Mgr based on City")
-                    print("6. Search for Events between dates")
-                    print("7. Logout")
+                    print("5. Logout")
 
                     ch = int(input("Enter choice> "))
                     sp.call('clear', shell=True)
-                    if ch >= 7:
+                    if ch >= 5:
                         break
                     else:
                         adminMenu(ch)
