@@ -269,7 +269,6 @@ while(1):
                     print("3. Search Records")
                     print("4. Update Records")
                     print("5. Logout")
-
                     ch = int(input("Enter choice> "))
                     sp.call('clear', shell=True)
                     if ch >= 5:
