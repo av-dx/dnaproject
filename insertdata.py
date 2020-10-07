@@ -1,4 +1,4 @@
-from searchdata import SearchEvents, SearchEmp
+from searchdata import SearchEvents, SearchEmp, lsManagerByCity
 
 
 def insertCustomer(cur, con):
@@ -101,9 +101,9 @@ def insertEmployee(role, cur, con):
 		cur.execute(query)
 		cur.execute("SELECT LAST_INSERT_ID()")
 		last_id = cur.fetchone()['LAST_INSERT_ID()']
-		con.commit()
+		#con.commit()
 		if role == 1:
-			insertAgent(last_id, cur,con)
+			insertAgent(last_id,row['city_of_work'],cur,con)
 		elif role == 2:
 			qualif = input("Qualfication of the Administrator: ")
 			cur.execute(
@@ -131,22 +131,25 @@ def insertEmployee(role, cur, con):
 
 	except Exception as e:
 		con.rollback()
-		print("Failed to insert Customer into database")
+		print("Failed to insert Employee into database")
 		print(">>>>>>>>>>>>>", e)
 	return last_id
 
 
-def insertAgent(last_id, cur, con):
+def insertAgent(last_id,city, cur, con):
 	cur.execute(
 		"INSERT INTO AGENT VALUES('%d','%d')" % (last_id, 0))
 	while(1):
-		x = input("To what manager does this agent report to?: Press 1 for existing Manager, 2 for new Manager ")
+		x = int(input("To what manager does this agent report to?: Press 1 for existing Manager, 2 for new Manager "))
 		if (x == 1):
-			manager = input("Enter Manager name: ")
-			print("Here are the matching records :")
-			SearchEmp(manager, cur, con)
+			#manager = input("Enter Manager name: ")
+			#print("Here are the matching records of managers of same city:")
+			#SearchEmp(manager, cur, con)
+			num_mgr_city = lsManagerByCity(city,cur,con)
+			if (num_mgr_city == -1):
+				continue
 			mgr_id = int(
-				input("Enter Employee(Manager) ID of the record you want to modify : "))
+				input("Enter Employee(Manager) ID of the record to whom this agent would report: "))
 			cur.execute("SELECT * FROM MANAGER WHERE mgr_id="+str(mgr_id))
 			record = cur.fetchone()
 			if (record is None):
