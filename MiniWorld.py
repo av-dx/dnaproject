@@ -7,12 +7,11 @@ from insertdata import *
 from modifydata import *
 from searchdata import *
 from deletedata import *
-from sanitize import *
 
 
 def avgBookingFees():
     try:
-        cityinput = sanitizeText(input("Enter City Name : "))
+        cityinput = input("Enter City Name : ")
 
         query = "SELECT AVG(amount) FROM PAYMENT WHERE booking_id IN (SELECT booking_id FROM EVENT WHERE city='%s')" % (
                 cityinput)
@@ -96,13 +95,13 @@ def PartSearch():  # For now its just search on names,if we want we can make it 
     print("3. Search for customers")
     ch = int(input("Enter Choice: "))
     if(ch == 1):
-        x = sanitizeText(input("Search(name or part of name): "))
+        x = input("Search(name or part of name): ")
         SearchEmp(x, cur, con)
     elif(ch == 2):
-        x = sanitizeText(input("Search(name or part of name): "))
+        x = input("Search(name or part of name): ")
         SearchEvents(x, cur, con)
     elif(ch == 3):
-        x = sanitizeText(input("Search(name or part of name): "))
+        x = input("Search(name or part of name): ")
         SearchCust(x, cur, con)
     else:
         print("Invalid Option")
@@ -158,7 +157,7 @@ def deleteMenu():
 
 
 def searchMenu():
-    print("1. Search for Agent based on City")
+    print("1. Search for Agent based on city")
     print("2. Search for Employee by name")
     print("3. Search for Employee by city")
     print("4. Search for Events between dates")
@@ -169,14 +168,14 @@ def searchMenu():
     if(ch == 1):
         lsAgentByCity(cur, con)
     elif(ch == 2):
-        name = sanitizeText(input("Enter name to search for : "))
+        name = input("Enter name to search for : ")
         SearchEmp(name, cur, con)
     elif(ch == 3):
         lsEmpByCity(cur, con)
     elif(ch == 4):
         lsEventBwDates(cur, con)
     elif(ch == 5):
-        name = sanitizeText(input("Enter name to search for : "))
+        name = input("Enter name to search for : ")
         SearchCust(name, cur, con)
     else:
         return
@@ -269,7 +268,6 @@ while(1):
                     print("3. Search Records")
                     print("4. Update Records")
                     print("5. Logout")
-
                     ch = int(input("Enter choice> "))
                     sp.call('clear', shell=True)
                     if ch >= 5:
