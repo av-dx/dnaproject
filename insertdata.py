@@ -103,16 +103,19 @@ def insertEmployee(role, cur, con):
         last_id = cur.fetchone()['LAST_INSERT_ID()']
         if role == 1:
             insertAgent(last_id, cur, con)
+            return last_id
         elif role == 2:
             qualif = input("Qualfication of the Administrator: ")
             cur.execute(
                 "INSERT INTO ADMINISTRATOR VALUES('%d','%s')" % (last_id, qualif))
             con.commit()
+            return last_id
         elif role == 3:
             tlevel = int(input("Tlevel of the Technician: "))
             cur.execute(
                 "INSERT INTO TECHNICIAN VALUES('%d','%d')" % (last_id, tlevel))
             con.commit()
+            return last_id
 
         elif role == 4:
             queryMgr = "SELECT COUNT(city_of_work) FROM EMPLOYEE,MANAGER WHERE city_of_work='%s' AND EMPLOYEE.emp_id=MANAGER.mgr_id" % (
@@ -127,6 +130,7 @@ def insertEmployee(role, cur, con):
             cur.execute(
                 "INSERT INTO MANAGER VALUES('%d','%d')" % (last_id, years))
             con.commit()
+            return last_id
         else:
             print("Wrong input try again")
 
@@ -134,7 +138,6 @@ def insertEmployee(role, cur, con):
         con.rollback()
         print("Failed to insert Employee into database")
         print(">>>>>>>>>>>>>", e)
-    return last_id
 
 
 def insertAgent(last_id, cur, con):
