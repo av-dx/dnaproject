@@ -188,6 +188,8 @@ def delEmployee(cur, con):
                 query2 = "DELETE FROM REPORTS_TO WHERE mgr_id=%d" % (
                     emp_id)
                 cur.execute(query2)
+                query = "DELETE FROM MANAGER WHERE mgr_id=%d" % (emp_id)
+                cur.execute(query)
                 cur.execute("SELECT agent_id FROM REPORTS_TO")
                 list2 = []
                 for row in cur:
@@ -195,19 +197,23 @@ def delEmployee(cur, con):
 
                 for agent_id in list1:
                     if agent_id not in list2:
-                        print("If you delete the required manager, then the agent %d wont be reporting to anyone.", agent_id)
                         cur.execute("SELECT emp_id,fname,lname,city_of_work FROM AGENT, EMPLOYEE WHERE agent_id=%d AND agent_id=emp_id" % (agent_id))
+                        table = Texttable()
+                        table.header(["Emp ID", "First Name", "Last Name", "City"])
+                        table.set_cols_dtype(["i", "t", "t", "t"])
                         for row in cur:
-                            print (row)#printing without table for now
+                            table.add_row([row['emp_id'], row['fname'], row['lname'], row['city_of_work']])
+                        print(table.draw())
+                        print("If you delete the required manager, then the agent %d wont be reporting to anyone." % (agent_id))
                         print("1. Fire this agent as well")
                         print("2. Replace with existing Manager/Hire new manager")
                         agmg = int(input())
                         if (agmg == 1):
-                            if(delAgent(agent,cur,con) == -1):
+                            if(delAgent(agent_id,cur,con) == -1):
                                 return
                         elif (agmg == 2):
                             mgr_id = insertAgent(agent_id,cur,con)
-                            print("The agent %d now reports to manager %d",(agent,mgr_id))
+                            print("The agent %d now reports to manager %d" % (agent_id,mgr_id))
 
                         else:
                             print("Wrong input.")
