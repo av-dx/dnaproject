@@ -174,6 +174,9 @@ def insertAgent(last_id, cur, con):
                 print("Enter the new Manager details: ")
                 mgr_id = insertEmployee(4, cur, con)
                 break
+            else:
+                print("Invalid Option!")
+                continue
         insertReportsTo(last_id, mgr_id, cur, con)
         con.commit()
         return mgr_id
