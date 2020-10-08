@@ -6,7 +6,7 @@ def avgBookingFees(cityinput,cur,con):
         #cityinput = input("Enter City Name : ")
         cur.execute("SELECT AVG(amount) FROM PAYMENT WHERE booking_id IN (SELECT booking_id FROM EVENT WHERE city=%s)",(cityinput))
         table = Texttable()
-        table.header(["Average Fees in ",cityinput])
+        table.header(["Average Fees in " + cityinput])
         for row in cur:
             table.add_row([row['AVG(amount)']])
         print(table.draw())
