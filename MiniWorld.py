@@ -8,6 +8,7 @@ from modifydata import *
 from searchdata import *
 from deletedata import *
 from reportdata import *
+import stdiomask
 
 
 def insertMenu():
@@ -157,7 +158,7 @@ while(1):
     print(r"                                              ")
 
     username = input("Username: ")
-    password = input("Password: ")
+    password = stdiomask.getpass(prompt = 'Password: ',mask='*')
 
     try:
         if username == "customer":
