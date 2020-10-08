@@ -10,7 +10,8 @@ def insertCustomer(cur, con):
         row['poi_type'] = input("Type of POI: ")
         row['poi_number'] = input("POI Number: ")
         query = "INSERT INTO CUSTOMER(fname,lname,poi_type,poi_number) VALUES (%s,%s,%s,%s)"
-        cur.execute(query,row['fname'], row['lname'], row['poi_type'], row['poi_number'])
+        cur.execute(query, (row['fname'], row['lname'],
+                            row['poi_type'], row['poi_number']))
         cur.execute("SELECT LAST_INSERT_ID()")
         last_id = cur.fetchone()['LAST_INSERT_ID()']
         con.commit()
@@ -42,15 +43,14 @@ def insertEvent(cur, con):
         row1 = {}
         row1['transdate'] = input(
             "Transaction date & time(YYYY-MM-DD hh:mm:ss): ")
-        row1['amount'] = float(input(
-            "Amount : "))
+        row1['amount'] = float(input("Amount : "))
         #row1['cust_id'] = cust_id
 
-        cur.execute("INSERT INTO PAYMENT(transdate, amount) VALUES (%s, %f)" ,(row1['transdate'], row1['amount']))
+        cur.execute("INSERT INTO PAYMENT(transdate, amount) VALUES (%s, %s)",
+                    (row1['transdate'], row1['amount']))
         cur.execute("SELECT LAST_INSERT_ID()")
         row['booking_id'] = cur.fetchone()['LAST_INSERT_ID()']
-
-        cur.execute("INSERT INTO EVENT(start_datetime, end_datetime, type, name, city, booking_id) VALUES (%s, %s, %s, %s, %s, %d)",(
+        cur.execute("INSERT INTO EVENT(start_datetime, end_datetime, type, name, city, booking_id) VALUES (%s, %s, %s, %s, %s, %s)", (
             row['start_datetime'], row['end_datetime'], row['type'], row['name'], row['city'], row['booking_id']))
         cur.execute("SELECT LAST_INSERT_ID()")
         row['event_id'] = cur.fetchone()['LAST_INSERT_ID()']
@@ -71,8 +71,8 @@ def insertContact(cur, con):
     while(1):
         phone = input("Enter Phone details: ")
         try:
-            query = "INSERT INTO CONTACT VALUES (%d,%s)",(cust_id, phone)
-            cur.execute(query)
+            query = "INSERT INTO CONTACT VALUES (%s,%s)"
+            cur.execute(query, (cust_id, phone))
             con.commit()
         except Exception as e:
             con.rollback()
@@ -97,26 +97,27 @@ def insertEmployee(role, cur, con):
         row['salary'] = int(input("Salary: "))
         row['city_of_work'] = input("City of work: ")
         row['contact'] = input("Contact: ")
-        query = "INSERT INTO EMPLOYEE(fname,lname,doj,salary,city_of_work,contact) VALUES (%s,%s,%s,%f,%s,%s)"
-        cur.execute(query,row['fname'], row['lname'], row['doj'], row['salary'], row['city_of_work'], row['contact'])
+        query = "INSERT INTO EMPLOYEE(fname,lname,doj,salary,city_of_work,contact) VALUES (%s,%s,%s,%s,%s,%s)"
+        cur.execute(query, (row['fname'], row['lname'], row['doj'],
+                            row['salary'], row['city_of_work'], row['contact']))
         cur.execute("SELECT LAST_INSERT_ID()")
         last_id = cur.fetchone()['LAST_INSERT_ID()']
         if role == 1:
             cur.execute(
-                "INSERT INTO AGENT VALUES(%d,%d)",(last_id, 0))
+                "INSERT INTO AGENT VALUES(%s,%s)", (last_id, 0))
             insertAgent(last_id, cur, con)
             return last_id
         elif role == 2:
             qualif = input("Qualfication of the Administrator: ")
             cur.execute(
-                "INSERT INTO ADMINISTRATOR VALUES(%d,%s)", (last_id, qualif))
+                "INSERT INTO ADMINISTRATOR VALUES(%s,%s)", (last_id, qualif))
             print("Administrator added successfully.")
             con.commit()
             return last_id
         elif role == 3:
             tlevel = int(input("Tlevel of the Technician: "))
             cur.execute(
-                "INSERT INTO TECHNICIAN VALUES(%d,%d)", (last_id, tlevel))
+                "INSERT INTO TECHNICIAN VALUES(%s,%s)", (last_id, tlevel))
             print("Technician added successfully.")
             con.commit()
             return last_id
@@ -125,12 +126,13 @@ def insertEmployee(role, cur, con):
             queryMgr = "SELECT COUNT(city_of_work) FROM EMPLOYEE,MANAGER WHERE city_of_work=%s AND EMPLOYEE.emp_id=MANAGER.mgr_id"
             cur.execute(queryMgr, row['city_of_work'])
             if(cur.fetchone()['COUNT(city_of_work)'] == 2):
-                print("There are already two managers to handle %s. Try again." % row['city_of_work'])
+                print("There are already two managers to handle %s. Try again." %
+                      row['city_of_work'])
                 return
 
             years = int(input("Years of Experience: "))
             cur.execute(
-                "INSERT INTO MANAGER VALUES(%d,%d)", (last_id, years))
+                "INSERT INTO MANAGER VALUES(%s,%s)", (last_id, years))
             print("Manager added successfully.")
             con.commit()
             return last_id
@@ -149,7 +151,8 @@ def insertAgent(last_id, cur, con):
             x = int(input(
                 "To what manager will this agent report to?: Press 1 for existing Manager, 2 for new Manager "))
             if (x == 1):
-                cur.execute("SELECT city_of_work FROM EMPLOYEE WHERE emp_id=%d",last_id)
+                cur.execute(
+                    "SELECT city_of_work FROM EMPLOYEE WHERE emp_id=%s", last_id)
                 city = cur.fetchone()['city_of_work']
                 num_mgr_city = lsManagerByCity(city, cur, con)
                 if (num_mgr_city == -1):
@@ -217,10 +220,11 @@ def makeBooking(cur, con):
                 raise Exception("Booking failed : Event could not be added")
             row['event_id'] = ebpair[0]
             row['booking_id'] = ebpair[1]
-            query = "INSERT INTO BOOKS VALUES(%d, %d, %d, %d)"
-            cur.execute(query,row['event_id'], row['cust_id'], row['agent_id'], row['booking_id'])
-            query = "UPDATE AGENT SET bookings_made=%d WHERE agent_id=%d"
-            cur.execute(query, agent['bookings_made']+1, row['agent_id'])
+            query = "INSERT INTO BOOKS VALUES(%s, %s, %s, %s)"
+            cur.execute(
+                query, (row['event_id'], row['cust_id'], row['agent_id'], row['booking_id']))
+            query = "UPDATE AGENT SET bookings_made=%s WHERE agent_id=%s"
+            cur.execute(query, (agent['bookings_made']+1, row['agent_id']))
             con.commit()
             print("Booking Done!")
         else:
@@ -238,15 +242,15 @@ def insertSpecialGuest(cur, con):
         print("Here are the matching records: ")
         SearchEvents(nameofevent, cur, con)
         required_id = int(input("Enter the event ID for the event: "))
-        query1 = "SELECT * FROM SPECIAL_GUEST WHERE event_id=%d"
-        cur.execute(query1,required_id)
+        query1 = "SELECT * FROM SPECIAL_GUEST WHERE event_id=%s"
+        cur.execute(query1, required_id)
         required_tuple = cur.fetchone()
         if(required_tuple is None):
             print("This Event ID doesn't exist! ")
             return
         else:
-            querySPG = "SELECT COUNT(event_id) FROM SPECIAL_GUEST WHERE event_id=%d"
-            cur.execute(querySPG,required_id)
+            querySPG = "SELECT COUNT(event_id) FROM SPECIAL_GUEST WHERE event_id=%s"
+            cur.execute(querySPG, required_id)
             if(cur.fetchone()['COUNT(event_id)'] == 3):
                 print(
                     "There are already three special guests visiting this event. Try again.")
@@ -258,7 +262,7 @@ def insertSpecialGuest(cur, con):
             row['name'] = input("Name of the Guest: ")
             row['occupation'] = input("Occupation of the Guest: ")
             row['contact'] = input("Contact of the Guest: ")
-            cur.execute("INSERT INTO SPECIAL_GUEST(event_id,name,occupation,contact) VALUES (%d %s %s %s)", (
+            cur.execute("INSERT INTO SPECIAL_GUEST(event_id,name,occupation,contact) VALUES (%s %s %s %s)", (
                 row['event_id'], row['name'], row['occupation'], row['contact']))
             con.commit()
             print("The Special Guest is registered into the database")
@@ -273,17 +277,18 @@ def insertSpecialGuest(cur, con):
 def insertReportsTo(agent_id, mgr_id, cur, con):
     try:
         cur.execute(
-            "SELECT city_of_work AS city FROM AGENT, EMPLOYEE WHERE agent_id=emp_id AND agent_id=%d", agent_id)
+            "SELECT city_of_work AS city FROM AGENT, EMPLOYEE WHERE agent_id=emp_id AND agent_id=%s", agent_id)
         agent = cur.fetchone()
         cur.execute(
-            "SELECT city_of_work AS city FROM MANAGER, EMPLOYEE WHERE mgr_id=emp_id AND mgr_id=%d", mgr_id)
+            "SELECT city_of_work AS city FROM MANAGER, EMPLOYEE WHERE mgr_id=emp_id AND mgr_id=%s", mgr_id)
         mgr = cur.fetchone()
         if (agent is None):
             raise Exception("Agent with that ID doesnt exist!")
         if (mgr is None):
             raise Exception("Manager with that ID doesnt exist!")
         if (agent['city'] == mgr['city']):
-            cur.execute("INSERT INTO REPORTS_TO VALUES (%d,%d)", (agent_id, mgr_id))
+            cur.execute("INSERT INTO REPORTS_TO VALUES (%s,%s)",
+                        (agent_id, mgr_id))
             con.commit()
         else:
             raise Exception(
