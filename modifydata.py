@@ -1,5 +1,5 @@
-from searchdata import SearchCust, SearchEvents, SearchEmp
-from insertdata import insertAgent
+from searchdata import SearchCust, SearchEvents, SearchEmp, lsManagerByCity
+from insertdata import insertAgent, insertReportsTo
 from sanitize import sanitizeText
 
 
@@ -224,6 +224,8 @@ def modifyEmployee(cur, con):
                     "DELETE FROM TECHNICIAN WHERE tech_id=%d" % (emp_id))
 
                 if (newrole == 1):
+                    cur.execute(
+                "INSERT INTO AGENT VALUES('%d','%d')" % (emp_id, 0))
                     insertAgent(emp_id, cur, con)
                 elif (newrole == 2):
                     qualification = sanitizeText(
