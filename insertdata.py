@@ -264,7 +264,7 @@ def insertSpecialGuest(cur, con):
         print("Here are the matching records: ")
         SearchEvents(nameofevent, cur, con)
         required_id = int(input("Enter the event ID for the event: "))
-        query1 = "SELECT * FROM SPECIAL_GUEST WHERE event_id=%s"
+        query1 = "SELECT * FROM EVENT WHERE event_id=%s"
         cur.execute(query1, required_id)
         required_tuple = cur.fetchone()
         if(required_tuple is None):
@@ -280,12 +280,12 @@ def insertSpecialGuest(cur, con):
 
             row = {}
             print("Please enter the details of the Special Guest")
-            row['event_id'] = input("Event ID for the event: ")
+            #row['event_id'] = input("Event ID for the event: ")
             row['name'] = input("Name of the Guest: ")
             row['occupation'] = input("Occupation of the Guest: ")
             row['contact'] = input("Contact of the Guest: ")
             cur.execute("INSERT INTO SPECIAL_GUEST(event_id,name,occupation,contact) VALUES (%s, %s, %s, %s)", (
-                row['event_id'], row['name'], row['occupation'], row['contact']))
+                required_id, row['name'], row['occupation'], row['contact']))
             con.commit()
             print("The Special Guest is registered into the database")
         return
