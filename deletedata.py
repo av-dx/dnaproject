@@ -25,7 +25,7 @@ def delContact(cur, con):
         while (len(todelete) <= len(cust)):
             sno = input(
                 "Enter the Sno of the Phone no. you want to delete, leave blank to quit :")
-            if sno:
+            if sno>0:
                 sno = int(sno)
                 todel = cust[sno-1]
                 if (todel in todelete):
