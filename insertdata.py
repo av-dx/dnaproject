@@ -87,7 +87,7 @@ def insertContact(cur, con):
     return
 
 
-def insertEmployee(role, cur, con):
+def insertEmployee(role, cur, con, last_agent_city=None):
     try:
         print("Enter new Employee details: ")
         row = {}
@@ -123,21 +123,12 @@ def insertEmployee(role, cur, con):
             return last_id
 
         elif role == 4:
-            queryMgr = "SELECT COUNT(city_of_work) FROM EMPLOYEE,MANAGER WHERE city_of_work=%s AND EMPLOYEE.emp_id=MANAGER.mgr_id"
-            cur.execute(queryMgr, row['city_of_work'])
-            if(cur.fetchone()['COUNT(city_of_work)'] == 2):
-                print("There are already two managers to handle %s. Try again." %
-                      row['city_of_work'])
-                return
-
-            years = int(input("Years of Experience: "))
-            cur.execute(
-                "INSERT INTO MANAGER VALUES(%s,%s)", (last_id, years))
-            print("Manager added successfully.")
-            con.commit()
+            insertManager(last_id, last_agent_city, cur, con)
             return last_id
         else:
+            con.rollback()
             print("Wrong input try again")
+        con.commit()
 
     except Exception as e:
         con.rollback()
@@ -147,13 +138,13 @@ def insertEmployee(role, cur, con):
 
 def insertAgent(last_id, cur, con):
     try:
+        cur.execute(
+            "SELECT city_of_work FROM EMPLOYEE WHERE emp_id=%s", last_id)
+        city = cur.fetchone()['city_of_work']
         while(1):
             x = int(input(
                 "To what manager will this agent report to?: Press 1 for existing Manager, 2 for new Manager "))
             if (x == 1):
-                cur.execute(
-                    "SELECT city_of_work FROM EMPLOYEE WHERE emp_id=%s", last_id)
-                city = cur.fetchone()['city_of_work']
                 num_mgr_city = lsManagerByCity(city, cur, con)
                 if (num_mgr_city == -1):
                     continue
@@ -169,7 +160,7 @@ def insertAgent(last_id, cur, con):
                     break
             elif (x == 2):
                 print("Enter the new Manager details: ")
-                mgr_id = insertEmployee(4, cur, con)
+                mgr_id = insertEmployee(4, cur, con, city)
                 break
             else:
                 print("Invalid Option!")
@@ -182,6 +173,30 @@ def insertAgent(last_id, cur, con):
         print("Failed to insert Agent into database")
         print(">>>>>>>>>>>>>", e)
     return
+
+
+def insertManager(last_id, last_agent_city, cur, con):
+    try:
+        cur.execute(
+            "SELECT city_of_work FROM EMPLOYEE WHERE emp_id=%s", (last_id))
+        city_name = cur.fetchone()['city_of_work']
+        queryMgr = "SELECT COUNT(city_of_work) FROM EMPLOYEE,MANAGER WHERE city_of_work=%s AND EMPLOYEE.emp_id=MANAGER.mgr_id"
+        cur.execute(queryMgr, city_name)
+        if(cur.fetchone()['COUNT(city_of_work)'] == 2):
+            raise Exception(
+                "There are already two managers to handle %s. Try again." % city_name)
+        years = int(input("Years of Experience: "))
+        cur.execute(
+            "INSERT INTO MANAGER VALUES(%s,%s)", (last_id, years))
+        if (last_agent_city is not None) and (last_agent_city != city_name):
+            raise Exception("The manager and agent aren't of the same city!")
+        else:
+            print("Manager added successfully.")
+            return last_id
+    except Exception as e:
+        con.rollback()
+        print("Failed to insert Agent into database")
+        print(">>>>>>>>>>>>>", e)
 
 
 def makeBooking(cur, con):
@@ -262,7 +277,7 @@ def insertSpecialGuest(cur, con):
             row['name'] = input("Name of the Guest: ")
             row['occupation'] = input("Occupation of the Guest: ")
             row['contact'] = input("Contact of the Guest: ")
-            cur.execute("INSERT INTO SPECIAL_GUEST(event_id,name,occupation,contact) VALUES (%s %s %s %s)", (
+            cur.execute("INSERT INTO SPECIAL_GUEST(event_id,name,occupation,contact) VALUES (%s, %s, %s, %s)", (
                 row['event_id'], row['name'], row['occupation'], row['contact']))
             con.commit()
             print("The Special Guest is registered into the database")
