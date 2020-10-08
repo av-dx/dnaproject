@@ -44,9 +44,8 @@ def modifyCustomer(cur, con):
                     record['poi_number'] = ''
                 else:
                     record['poi_number'] = poi_number
-            query = "UPDATE CUSTOMER SET fname='%s', lname='%s', poi_type='%s', poi_number='%s' WHERE cust_id='%d'" % (
-                record['fname'], record['lname'], record['poi_type'], record['poi_number'], cust_id)
-            cur.execute(query)
+            cur.execute("UPDATE CUSTOMER SET fname=%s, lname=%s, poi_type=%s, poi_number=%s WHERE cust_id=%d" , (
+                record['fname'], record['lname'], record['poi_type'], record['poi_number'], cust_id))
             con.commit()
             print("Record updated successfully!")
     except Exception as e:
@@ -104,9 +103,8 @@ def modifyEvent(cur, con):
                 else:
                     record['city'] = city
 
-            query = "UPDATE EVENT SET start_datetime='%s', end_datetime='%s', type='%s', name='%s', city='%s' WHERE event_id='%d'" % (
-                record['start_datetime'], record['end_datetime'], record['type'], record['name'], record['city'], event_id)
-            cur.execute(query)
+            cur.execute("UPDATE EVENT SET start_datetime=%s, end_datetime=%s, type=%s, name=%s, city=%s WHERE event_id%d" , (
+                record['start_datetime'], record['end_datetime'], record['type'], record['name'], record['city'], event_id))
             con.commit()
             print("Record updated successfully!")
     except Exception as e:
@@ -172,19 +170,18 @@ def modifyEmployee(cur, con):
                 else:
                     record['contact'] = contact
 
-            query = "UPDATE EMPLOYEE SET fname='%s', lname='%s', doj='%s', salary='%f', city_of_work='%s', contact='%s' WHERE emp_id='%d'" % (
-                record['fname'], record['lname'], record['doj'], record['salary'], record['city_of_work'], record['contact'], emp_id)
-            cur.execute(query)
+            cur.execute("UPDATE EMPLOYEE SET fname=%s, lname=%s, doj=%s, salary=%f, city_of_work=%s, contact=%s WHERE emp_id=%d" , (
+                record['fname'], record['lname'], record['doj'], record['salary'], record['city_of_work'], record['contact'], emp_id))
 
             # Change Roles
             agent = cur.execute(
-                "SELECT emp_id,fname, lname, bookings_made FROM EMPLOYEE, AGENT WHERE emp_id IN (SELECT agent_id FROM AGENT) AND emp_id=%d" % (emp_id))
+                "SELECT emp_id,fname, lname, bookings_made FROM EMPLOYEE, AGENT WHERE emp_id IN (SELECT agent_id FROM AGENT) AND emp_id=%d" , (emp_id))
             manager = cur.execute(
-                "SELECT emp_id,fname, lname, years_of_experience FROM EMPLOYEE, MANAGER WHERE emp_id IN (SELECT mgr_id FROM MANAGER) AND emp_id=%d" % (emp_id))
+                "SELECT emp_id,fname, lname, years_of_experience FROM EMPLOYEE, MANAGER WHERE emp_id IN (SELECT mgr_id FROM MANAGER) AND emp_id=%d" , (emp_id))
             admin = cur.execute(
-                "SELECT emp_id,fname, lname, qualification FROM EMPLOYEE, ADMINISTRATOR WHERE emp_id IN (SELECT admin_id FROM ADMINISTRATOR) AND emp_id=%d" % (emp_id))
+                "SELECT emp_id,fname, lname, qualification FROM EMPLOYEE, ADMINISTRATOR WHERE emp_id IN (SELECT admin_id FROM ADMINISTRATOR) AND emp_id=%d" , (emp_id))
             tech = cur.execute(
-                "SELECT emp_id,fname, lname, tlevel FROM EMPLOYEE, TECHNICIAN WHERE emp_id IN (SELECT tech_id FROM TECHNICIAN) AND emp_id=%d" % (emp_id))
+                "SELECT emp_id,fname, lname, tlevel FROM EMPLOYEE, TECHNICIAN WHERE emp_id IN (SELECT tech_id FROM TECHNICIAN) AND emp_id=%d" , (emp_id))
 
             print("Currently this employee is a", end=' ')
             if(tech > 0):
@@ -214,33 +211,33 @@ def modifyEmployee(cur, con):
                     break
 
             if (newrole != role):
-                cur.execute("DELETE FROM REPORTS_TO WHERE agent_id=%d OR mgr_id=%d" % (
+                cur.execute("DELETE FROM REPORTS_TO WHERE agent_id=%d OR mgr_id=%d" , (
                     emp_id, emp_id))
-                cur.execute("DELETE FROM AGENT WHERE agent_id=%d" % (emp_id))
-                cur.execute("DELETE FROM MANAGER WHERE mgr_id=%d" % (emp_id))
-                cur.execute("DELETE FROM ADMINISTRATOR WHERE admin_id=%d" % (
+                cur.execute("DELETE FROM AGENT WHERE agent_id=%d" , (emp_id))
+                cur.execute("DELETE FROM MANAGER WHERE mgr_id=%d" , (emp_id))
+                cur.execute("DELETE FROM ADMINISTRATOR WHERE admin_id=%d" , (
                     emp_id))
                 cur.execute(
-                    "DELETE FROM TECHNICIAN WHERE tech_id=%d" % (emp_id))
+                    "DELETE FROM TECHNICIAN WHERE tech_id=%d" , (emp_id))
 
                 if (newrole == 1):
                     cur.execute(
-                "INSERT INTO AGENT VALUES('%d','%d')" % (emp_id, 0))
+                "INSERT INTO AGENT VALUES(%d,%d)" , (emp_id, 0))
                     insertAgent(emp_id, cur, con)
                 elif (newrole == 2):
                     qualification = sanitizeText(
                         input("Enter the qualification : "))
-                    cur.execute("INSERT INTO ADMINISTRATOR VALUES (%d,'%s')" % (
+                    cur.execute("INSERT INTO ADMINISTRATOR VALUES (%d,%s)" , (
                         emp_id, qualification))
                 elif (newrole == 3):
                     tlevel = int(sanitizeText(
                         input("Enter technicians level : ")))
-                    cur.execute("INSERT INTO TECHNICIAN VALUES (%d,%d)" %
+                    cur.execute("INSERT INTO TECHNICIAN VALUES (%d,%d)" ,
                                 (emp_id, tlevel))
                 else:
                     years = int(sanitizeText(input("Years of Experience: ")))
                     cur.execute(
-                        "INSERT INTO MANAGER VALUES('%d','%d')" % (emp_id, years))
+                        "INSERT INTO MANAGER VALUES(%d,%d)" , (emp_id, years))
             con.commit()
             print("Record updated successfully!")
     except Exception as e:
