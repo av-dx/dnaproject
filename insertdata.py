@@ -1,4 +1,4 @@
-from searchdata import SearchEvents, SearchEmp, lsManagerByCity
+from searchdata import SearchEvents, SearchEmp, lsManagerByCity, SearchCust
 
 
 def insertCustomer(cur, con):
@@ -66,6 +66,9 @@ def insertEvent(cur, con, cust_id):
 
 
 def insertContact(cur, con):
+
+    name = input("Enter Customer name to search for :")
+    SearchCust(name, cur, con)
     cust_id = input("Enter Customer ID: ")
     while(1):
         phone = input("Enter Phone details: ")
@@ -102,18 +105,22 @@ def insertEmployee(role, cur, con):
         cur.execute("SELECT LAST_INSERT_ID()")
         last_id = cur.fetchone()['LAST_INSERT_ID()']
         if role == 1:
+            cur.execute(
+                "INSERT INTO AGENT VALUES('%d','%d')" % (last_id, 0))
             insertAgent(last_id, cur, con)
             return last_id
         elif role == 2:
             qualif = input("Qualfication of the Administrator: ")
             cur.execute(
                 "INSERT INTO ADMINISTRATOR VALUES('%d','%s')" % (last_id, qualif))
+            print("Administrator added successfully.")
             con.commit()
             return last_id
         elif role == 3:
             tlevel = int(input("Tlevel of the Technician: "))
             cur.execute(
                 "INSERT INTO TECHNICIAN VALUES('%d','%d')" % (last_id, tlevel))
+            print("Technician added successfully.")
             con.commit()
             return last_id
 
@@ -129,6 +136,7 @@ def insertEmployee(role, cur, con):
             years = int(input("Years of Experience: "))
             cur.execute(
                 "INSERT INTO MANAGER VALUES('%d','%d')" % (last_id, years))
+            print("Manager added successfully.")
             con.commit()
             return last_id
         else:
@@ -141,34 +149,39 @@ def insertEmployee(role, cur, con):
 
 
 def insertAgent(last_id, cur, con):
-    cur.execute(
-        "INSERT INTO AGENT VALUES('%d','%d')" % (last_id, 0))
-    while(1):
-        x = int(input(
-            "To what manager does this agent report to?: Press 1 for existing Manager, 2 for new Manager "))
-        if (x == 1):
-            cur.execute("SELECT city_of_work FROM EMPLOYEE WHERE emp_id=%d" % (
-                last_id))
-            city = cur.fetchone()['city_of_work']
-            num_mgr_city = lsManagerByCity(city, cur, con)
-            if (num_mgr_city == -1):
-                continue
-            mgr_id = int(
-                input("Enter Employee(Manager) ID of the record to whom this agent would report: "))
-            cur.execute("SELECT * FROM MANAGER WHERE mgr_id="+str(mgr_id))
-            record = cur.fetchone()
-            if (record is None):
-                print("This Manager ID doesnt exist! Create a new manager")
-                continue
-            else:
-                print("Agent added successfully.")
+    try:
+        while(1):
+            x = int(input(
+                "To what manager will this agent report to?: Press 1 for existing Manager, 2 for new Manager "))
+            if (x == 1):
+                cur.execute("SELECT city_of_work FROM EMPLOYEE WHERE emp_id=%d" % (
+                    last_id))
+                city = cur.fetchone()['city_of_work']
+                num_mgr_city = lsManagerByCity(city, cur, con)
+                if (num_mgr_city == -1):
+                    continue
+                mgr_id = int(
+                    input("Enter Employee(Manager) ID of the record to whom this agent would report: "))
+                cur.execute("SELECT * FROM MANAGER WHERE mgr_id="+str(mgr_id))
+                record = cur.fetchone()
+                if (record is None):
+                    print("This Manager ID doesnt exist! Create a new manager")
+                    continue
+                else:
+                    print("Agent added successfully.")
+                    break
+            elif (x == 2):
+                print("Enter the new Manager details: ")
+                mgr_id = insertEmployee(4, cur, con)
                 break
-        elif (x == 2):
-            print("Enter the new Manager details: ")
-            mgr_id = insertEmployee(4, cur, con)
-            break
-    insertReportsTo(last_id, mgr_id, cur, con)
-    con.commit()
+        insertReportsTo(last_id, mgr_id, cur, con)
+        con.commit()
+        return mgr_id
+    except Exception as e:
+        con.rollback()
+        print("Failed to insert Agent into database")
+        print(">>>>>>>>>>>>>", e)
+    return
 
 
 def makeBooking(cur, con):
@@ -179,6 +192,8 @@ def makeBooking(cur, con):
         print("Does an existing customer booking again or a new customer is availing the service? Press 1 for existing, 2(or any other key) for new customer")
         x = int(input())
         if x == 1:
+            name = input("Enter Customer name to search for :")
+            SearchCust(name, cur, con)
             row["cust_id"] = int(input("Customer ID: "))
         else:  # Inserting a new customer in the database, cust id being auto incremented
             row["cust_id"] = insertCustomer(cur, con)

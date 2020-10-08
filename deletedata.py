@@ -1,3 +1,4 @@
+from insertdata import insertAgent
 from searchdata import SearchCust, SearchEvents, SearchEmp
 from texttable import Texttable
 
@@ -5,7 +6,7 @@ from texttable import Texttable
 def delContact(cur, con):
     try:
         name = input(
-            "Search for the customer name whose contact you want to delete : ")
+            "Search for the customer name whose contact you want to delete(Simply press enter if you want to see the whole list) : ")
         SearchCust(name, cur, con)
         cust_id = int(
             input("Enter the customer ID whose contact you want to delete : "))
@@ -28,7 +29,7 @@ def delContact(cur, con):
                 sno = int(sno)
                 todel = cust[sno-1]
                 if (todel in todelete):
-                    print("Number already deleted!")
+                    print("Number already selected for deletion!")
                     continue
                 else:
                     todelete.append(todel)
@@ -73,7 +74,7 @@ def delReportsTo(agent_id, mgr_id, cur, con):
 
 def delSpecialGuest(cur, con):
     try:
-        eventname = input("Enter the name of the Event: ")
+        eventname = input("Enter the name of the Event(Simply press enter to see the whole list): ")
         SearchEvents(eventname, cur, con)
         required_id = int(
             input("Enter the event ID you want to perform the operation in: "))
@@ -124,10 +125,30 @@ def delSpecialGuest(cur, con):
         print(">>>>>>>>>>>>>", e)
 
 
+def delAgent(agent_id,cur,con):
+    try:
+        query = "DELETE FROM REPORTS_TO WHERE agent_id=%d" % (
+            agent_id)
+        cur.execute(query)
+        query = "DELETE FROM AGENT WHERE agent_id=%d" % (agent_id)
+        cur.execute(query)
+        query = "DELETE FROM EMPLOYEE WHERE emp_id=%d" % (agent_id)
+        cur.execute(query)
+        con.commit()
+        print("Deletion Successful")
+        return 0
+
+    except Exception as e:
+        con.rollback()
+        print("Failed to delete employees from database")
+        print(">>>>>>>>>>>>>", e)
+        return -1
+
+
 def delEmployee(cur, con):
     try:
         name = input(
-            "Search for the Employee name whose contact you want to delete : ")
+            "Search for the Employee name whose contact you want to delete(Simply press enter to see the whole list) : ")
         SearchEmp(name, cur, con)
         emp_id = int(
             input("Enter the Employee ID who you want to fire(delete) : "))
@@ -151,9 +172,47 @@ def delEmployee(cur, con):
             print("Agent")
 
         if (input("Do you wish to delete this Employee (y/N) ?").lower() == 'y'):
-            query = "DELETE FROM REPORTS_TO WHERE agent_id=%d OR mgr_id=%d" % (
-                emp_id, emp_id)
-            cur.execute(query)
+
+            if(agent>0):
+                query = "DELETE FROM REPORTS_TO WHERE agent_id=%d" % (
+                    emp_id)
+                cur.execute(query)
+            if(manager>0):#to handle min max constarint of agent and managers
+                query1 = "SELECT agent_id FROM REPORTS_TO WHERE mgr_id=%d" % (emp_id)
+                cur.execute(query1)
+                list1 = []
+                for row in cur:
+                    list1.append(row['agent_id'])
+
+
+                query2 = "DELETE FROM REPORTS_TO WHERE mgr_id=%d" % (
+                    emp_id)
+                cur.execute(query2)
+                cur.execute("SELECT agent_id FROM REPORTS_TO")
+                list2 = []
+                for row in cur:
+                    list2.append(row['agent_id'])
+
+                for agent_id in list1:
+                    if agent_id not in list2:
+                        print("If you delete the required manager, then the agent %d wont be reporting to anyone.", agent_id)
+                        cur.execute("SELECT emp_id,fname,lname,city_of_work FROM AGENT, EMPLOYEE WHERE agent_id=%d AND agent_id=emp_id" % (agent_id))
+                        for row in cur:
+                            print (row)#printing without table for now
+                        print("1. Fire this agent as well")
+                        print("2. Replace with existing Manager/Hire new manager")
+                        agmg = int(input())
+                        if (agmg == 1):
+                            if(delAgent(agent,cur,con) == -1):
+                                return
+                        elif (agmg == 2):
+                            mgr_id = insertAgent(agent_id,cur,con)
+                            print("The agent %d now reports to manager %d",(agent,mgr_id))
+
+                        else:
+                            print("Wrong input.")
+                            raise Exception("Wrong input. Deletion cancelled!")
+
             query = "DELETE FROM AGENT WHERE agent_id=%d" % (emp_id)
             cur.execute(query)
             query = "DELETE FROM MANAGER WHERE mgr_id=%d" % (emp_id)
