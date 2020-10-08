@@ -16,26 +16,26 @@ def modifyCustomer(cur, con):
         else:
             print(
                 "Press enter to accept current value, or type the new value, type NULL to set it to NULL.")
-            fname = input("First Name : "+record['fname']+' --> ')
+            fname = input("First Name : %s ---> " % record['fname'])
             if fname:
                 if (fname == 'NULL'):
                     record['fname'] = ''
                 else:
                     record['fname'] = fname
-            lname = input("Last Name : "+record['lname']+' --> ')
+            lname = input("Last Name : %s ---> " % record['lname'])
             if lname:
                 if (lname == 'NULL'):
                     record['lname'] = ''
                 else:
                     record['lname'] = lname
-            poi_type = input("POI poi_type : "+record['poi_type']+' --> ')
+            poi_type = input("POI poi_type : %s ---> " % record['poi_type'])
             if poi_type:
                 if (poi_type == 'NULL'):
                     record['poi_type'] = ''
                 else:
                     record['poi_type'] = poi_type
             poi_number = input(
-                "POI Number : "+record['poi_number']+' --> ')
+                "POI Number : %s ---> " % record['poi_number'])
             if poi_number:
                 if (poi_number == 'NULL'):
                     record['poi_number'] = ''
@@ -66,33 +66,33 @@ def modifyEvent(cur, con):
             print(
                 "Press enter to accept current value, or type the new value, type NULL to set it to NULL.")
             start_datetime = input(
-                "Starting of the event : %s", (record['start_datetime'])+' --> ')
+                "Starting of the event : %s ---> " % (record['start_datetime']))
             if start_datetime:
                 if (start_datetime == 'NULL'):
                     record['start_datetime'] = ''
                 else:
                     record['start_datetime'] = start_datetime
             end_datetime = input(
-                "When does the event end : %s", (record['end_datetime'])+' --> ')
+                "When does the event end : %s ---> " % (record['end_datetime']))
             if end_datetime:
                 if (end_datetime == 'NULL'):
                     record['end_datetime'] = ''
                 else:
                     record['end_datetime'] = end_datetime
-            eventtype = input("Type of Event: "+record['type']+' --> ')
+            eventtype = input("Type of Event: %s ---> " % record['type'])
             if eventtype:
                 if (eventtype == 'NULL'):
                     record['type'] = ''
                 else:
                     record['type'] = eventtype
             name = input(
-                "Name : "+record['name']+' --> ')
+                "Name : %s ---> " % record['name'])
             if name:
                 if (name == 'NULL'):
                     record['name'] = ''
                 else:
                     record['name'] = name
-            city = input("City: "+record['city']+' --> ')
+            city = input("City: %s ---> " % record['city'])
             if city:
                 if (city == 'NULL'):
                     record['city'] = ''
@@ -123,37 +123,37 @@ def modifyEmployee(cur, con):
         else:
             print(
                 "Press enter to accept current value, or type the new value, type NULL to set it to NULL.")
-            fname = input("First Name : %s", (record['fname'])+' --> ')
+            fname = input("First Name : %s ---> " % (record['fname']))
             if fname:
                 if (fname == 'NULL'):
                     record['fname'] = ''
                 else:
                     record['fname'] = fname
-            lname = input("Last Name : %s", (record['lname'])+' --> ')
+            lname = input("Last Name : %s ---> " % (record['lname']))
             if lname:
                 if (lname == 'NULL'):
                     record['lname'] = ''
                 else:
                     record['lname'] = lname
-            doj = input("Date of Joining: " + str(record['doj'])+' --> ')
+            doj = input("Date of Joining: %s ---> " % (record['doj']))
             if doj:
                 if (doj == 'NULL'):
                     record['doj'] = ''
                 else:
                     record['doj'] = doj
-            salary = input("Salary : %s", (record['salary'])+' --> ')
+            salary = input("Salary : %s ---> " % (record['salary']))
             if salary:
                 if (salary == 'NULL'):
                     record['salary'] = 0
                 else:
                     record['salary'] = float(salary)
-            city_of_work = input("City: "+record['city_of_work']+' --> ')
+            city_of_work = input("City: %s ---> " % record['city_of_work'])
             if city_of_work:
                 if (city_of_work == 'NULL'):
                     record['city_of_work'] = ''
                 else:
                     record['city_of_work'] = city_of_work
-            contact = input("Contact: "+record['contact']+' --> ')
+            contact = input("Contact: %s ---> " % record['contact'])
             if contact:
                 if (contact == 'NULL'):
                     record['contact'] = ''
