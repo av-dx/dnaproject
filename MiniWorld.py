@@ -78,7 +78,7 @@ def searchMenu():
         lsEmpByCity(cur, con)
     elif(ch == 4):
         name = input("Enter name to search for : ")
-        SearchEvents(name,cur,con)
+        SearchEvents(name, cur, con)
     elif(ch == 5):
         lsEventBwDates(cur, con)
     elif(ch == 6):
@@ -104,6 +104,7 @@ def updateMenu():
     else:
         return
 
+
 def reportsMenu():
     print("1. Display Average Booking Fees based on city")
     print("2. Display the number of employees citywise")
@@ -113,11 +114,11 @@ def reportsMenu():
     sp.call('clear', shell=True)
     if(ch == 1):
         cityinput = input("Enter city name: ")
-        avgBookingFees(cityinput,cur,con)
+        avgBookingFees(cityinput, cur, con)
     elif(ch == 2):
-        countEmployee(cur,con)
+        countEmployee(cur, con)
     elif(ch == 3):
-        countCust(cur,con)
+        countCust(cur, con)
     else:
         return
 
@@ -142,6 +143,9 @@ def custMenu(ch):
         lsAgentByCity(cur, con)
     elif(ch == 2):
         lsEventBwDates(cur, con)
+    elif(ch == 3):
+        cityinput = input("Enter city name: ")
+        avgBookingFees(cityinput, cur, con)
     else:
         print("Error: Invalid Option")
 
@@ -158,7 +162,7 @@ while(1):
     print(r"                                              ")
 
     username = input("Username: ")
-    password = stdiomask.getpass(prompt = 'Password: ',mask='*')
+    password = stdiomask.getpass(prompt='Password: ', mask='*')
 
     try:
         if username == "customer":
@@ -207,10 +211,11 @@ while(1):
                     sp.call('clear', shell=True)
                     print("1. Search for Agent based on City")
                     print("2. Search for Events between dates")
-                    print("3. Logout")
+                    print("3. Lookup average booking fee for a city")
+                    print("4. Logout")
                     ch = int(input("Enter choice> "))
                     sp.call('clear', shell=True)
-                    if ch >= 3:
+                    if ch >= 4:
                         break
                     else:
                         custMenu(ch)
