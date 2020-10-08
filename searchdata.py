@@ -52,8 +52,7 @@ def lsManagerByCity(city, cur, con):
     try:
         query = "SELECT emp_id, fname, lname, contact FROM MANAGER, EMPLOYEE WHERE mgr_id=emp_id AND city_of_work='%s'" % (
             city)
-        cur.execute(query)
-        if (cur == 0):
+        if (cur.execute(query) == 0):
             print("No Managers in the given city.")
             return -1
         print("List of Managers in:", city)
