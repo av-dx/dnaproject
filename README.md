@@ -20,7 +20,7 @@
   * Log in as a root user to MySQL [sudo mysql -p].
   * Run the following commands.
   ```
-  CREATE USER 'customer'@'localhost' IDENTIFIED BY 'user_password';
+  CREATE USER 'customer'@'localhost' IDENTIFIED BY 'customer#caaltd';
   GRANT SELECT ON caaltd.* TO 'customer'@'localhost' IDENTIFIED BY 'customer#caaltd';
   FLUSH PRIVILEGES;
   ```
