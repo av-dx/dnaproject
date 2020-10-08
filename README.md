@@ -16,6 +16,14 @@
 * Download texttable from pip. We have used this library just for printing tables. USE [pip3 install texttable] in the terminal.
 * Create a database named 'caaltd'(without quotes)
 * Import the sql file into your mysql local system. USE [mysql -u <username> -p caaltd < caaltd.sql] in terminal.
+* To create a 'customer' user with READ-ONLY permissions to the database :
+  * Log in as a root user to MySQL [sudo mysql -p].
+  * Run the following commands.
+  ```
+  CREATE USER 'customer'@'localhost' IDENTIFIED BY 'user_password';
+  GRANT SELECT ON caaltd.* TO 'customer'@'localhost' IDENTIFIED BY 'customer#caaltd';
+  FLUSH PRIVILEGES;
+  ```
 * Run the Miniworld.py file in python3 in the terminal.
 * You will be welcomed by a CLI(Command-Line-Interface) in which you can access the database as a customer or an administrator/    admin.
   * If you are a customer -> enter the username as 'customer'(without quotes). Customer has to be added by system root and will have limited privileges restricted to searching and viewing.
