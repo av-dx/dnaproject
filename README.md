@@ -14,6 +14,7 @@
 * Download or Clone the repo into your local system.
 * The folder contains an .sql file and 4 .py files which are for different types of queries.
 * Download texttable from pip. We have used this library just for printing tables. USE [pip3 install texttable] in the terminal.
+* Download stdiomask from pip. We have used this to mask the password.
 * Create a database named 'caaltd'(without quotes)
 * Import the sql file into your mysql local system. USE [mysql -u <username> -p caaltd < caaltd.sql] in terminal.
 * To create a 'customer' user with READ-ONLY permissions to the database :
