@@ -131,6 +131,7 @@ def insertEmployee(role, cur, con, last_agent_city=None):
 
         elif role == 4:
             insertManager(last_id, last_agent_city, cur, con)
+            con.commit()
             return last_id
         else:
             con.rollback()
