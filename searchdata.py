@@ -133,8 +133,8 @@ def SearchCust(x, cur, con):
         for r in cur:
             custs.append(r)
         for row in custs:
-            cur.execute("SELECT phone FROM CONTACT WHERE cust_id=" +
-                        str(row['cust_id']))
+            cur.execute(
+                "SELECT phone FROM CONTACT WHERE cust_id=%s", (row['cust_id']))
             contacts = ""
             for ph in cur:
                 contacts += ph['phone'] + '\n'
