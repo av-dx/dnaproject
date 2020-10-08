@@ -7,105 +7,7 @@ from insertdata import *
 from modifydata import *
 from searchdata import *
 from deletedata import *
-
-
-def avgBookingFees():
-    try:
-        cityinput = input("Enter City Name : ")
-
-        query = "SELECT AVG(amount) FROM PAYMENT WHERE booking_id IN (SELECT booking_id FROM EVENT WHERE city='%s')" % (
-                cityinput)
-        cur.execute(query)
-        table = Texttable()
-        table.header(["Average Fees in "+cityinput])
-        for row in cur:
-            table.add_row([row['AVG(amount)']])
-        print(table.draw())
-
-    except Exception as e:
-        con.rollback()
-        print("Failed to retreive values.")
-        print(">>>>>>>>>>>>>", e)
-
-    return
-
-
-def UpdateData():
-    print("What do you wnat to do: ")
-    print("1. Insert.")
-    print("2. Modify.")
-    print("3. Delete.")
-    x = int(input())
-    if x == 1:
-        print("What do you want to insert?")
-        print("1. Customer")
-        print("2. Contact of Customer")
-        print("3. Location")
-        print("4. Employee")
-        print("5. Reports To")
-        # only for existing booking ID as new payment is covered in new booking.
-        print("6. Payment")
-        print("7. Event")
-        print("8. Special Guest")
-
-    if x == 2:
-        print("What do you want to modify?")
-        print("1. Customer")
-        print("2. Contact of Customer")
-        print("3. Location")
-        print("4. Employee")
-        print("5. Reports To")  # both attributes are modifiyable.
-        # only for existing booking ID as new payment is covered in new booking.
-        print("6. Payment")
-        print("7. Event")
-        print("8. Special Guest")
-        y = int(input())
-        if y == 1:
-            modifyCustomer(cur, con)
-
-
-def countEntities():
-    try:
-        print(
-            "Enter which entity you want to count: Press 1 for Employees, 2 for customers")
-
-        x = int(input())
-        if (x == 1):
-            query = "SELECT COUNT(emp_id),city_of_work FROM EMPLOYEE GROUP BY city_of_work"
-        # elif (x == 2):
-        #    query = "SELECT COUNT(cityname) FROM LOCATION"
-        elif (x == 2):
-            query = "SELECT COUNT(BOOKS.cust_id),EVENT.city FROM BOOKS INNER JOIN EVENT ON BOOKS.event_id=EVENT.event_id GROUP BY EVENT.city"
-
-        cur.execute(query)
-        for row in cur:
-            print(row)
-
-    except Exception as e:
-        con.rollback()
-        print("Failed to fetch from database")
-        print(">>>>>>>>>>>>>", e)
-
-        return
-
-
-def PartSearch():  # For now its just search on names,if we want we can make it on any column
-    print("1. Search for Employees")
-    print("2. Search for Events")
-    print("3. Search for customers")
-    ch = int(input("Enter Choice: "))
-    if(ch == 1):
-        x = input("Search(name or part of name): ")
-        SearchEmp(x, cur, con)
-    elif(ch == 2):
-        x = input("Search(name or part of name): ")
-        SearchEvents(x, cur, con)
-    elif(ch == 3):
-        x = input("Search(name or part of name): ")
-        SearchCust(x, cur, con)
-    else:
-        print("Invalid Option")
-    return
+from reportdata import *
 
 
 def insertMenu():
@@ -160,9 +62,10 @@ def searchMenu():
     print("1. Search for Agent based on city")
     print("2. Search for Employee by name")
     print("3. Search for Employee by city")
-    print("4. Search for Events between dates")
-    print("5. Search for Customer by name")
-    print("6. Back")
+    print("4. Search for Events by name")
+    print("5. Search for Events between dates")
+    print("6. Search for Customer by name")
+    print("7. Back")
     ch = int(input("Enter choice> "))
     sp.call('clear', shell=True)
     if(ch == 1):
@@ -173,8 +76,11 @@ def searchMenu():
     elif(ch == 3):
         lsEmpByCity(cur, con)
     elif(ch == 4):
-        lsEventBwDates(cur, con)
+        name = input("Enter name to search for : ")
+        SearchEvents(name,cur,con)
     elif(ch == 5):
+        lsEventBwDates(cur, con)
+    elif(ch == 6):
         name = input("Enter name to search for : ")
         SearchCust(name, cur, con)
     else:
@@ -197,6 +103,23 @@ def updateMenu():
     else:
         return
 
+def reportsMenu():
+    print("1. Display Average Booking Fees based on city")
+    print("2. Display the number of employees citywise")
+    print("3. Display the number of customers who booked events citywise")
+    print("4. Back")
+    ch = int(input())
+    sp.call('clear', shell=True)
+    if(ch == 1):
+        cityinput = input("Enter city name: ")
+        avgBookingFees(cityinput,cur,con)
+    elif(ch == 2):
+        countEmployee(cur,con)
+    elif(ch == 3):
+        countCust(cur,con)
+    else:
+        return
+
 
 def adminMenu(ch):
     if(ch == 1):
@@ -207,6 +130,8 @@ def adminMenu(ch):
         searchMenu()
     elif(ch == 4):
         updateMenu()
+    elif(ch == 5):
+        reportsMenu()
     else:
         print("Error: Invalid Option")
 
@@ -267,10 +192,11 @@ while(1):
                     print("2. Delete Records")
                     print("3. Search Records")
                     print("4. Update Records")
-                    print("5. Logout")
+                    print("5. View Reports")
+                    print("6. Logout")
                     ch = int(input("Enter choice> "))
                     sp.call('clear', shell=True)
-                    if ch >= 5:
+                    if ch >= 6:
                         break
                     else:
                         adminMenu(ch)
