@@ -10,7 +10,7 @@ def modifyCustomer(cur, con):
         SearchCust(name, cur, con)
         cust_id = int(
             sanitizeText(input("Enter Customer ID of the record you want to modify : ")))
-        cur.execute("SELECT * FROM CUSTOMER WHERE cust_id="+str(cust_id))
+        cur.execute("SELECT * FROM CUSTOMER WHERE cust_id=%s",(cust_id))
         record = cur.fetchone()
         if (record is None):
             raise Exception("This Customer ID doesnt exist!")
@@ -61,7 +61,7 @@ def modifyEvent(cur, con):
         SearchEvents(name, cur, con)
         event_id = int(
             sanitizeText(input("Enter Event ID of the record you want to modify : ")))
-        cur.execute("SELECT * FROM EVENT WHERE event_id="+str(event_id))
+        cur.execute("SELECT * FROM EVENT WHERE event_id=%s" , (event_id))
         record = cur.fetchone()
         if (record is None):
             raise Exception("This Event ID doesnt exist!")
@@ -69,14 +69,14 @@ def modifyEvent(cur, con):
             print(
                 "Press enter to accept current value, or type the new value, type NULL to set it to NULL.")
             start_datetime = sanitizeText(input(
-                "Starting of the event : "+str(record['start_datetime'])+' --> '))
+                "Starting of the event : %s",(record['start_datetime'])+' --> '))
             if start_datetime:
                 if (start_datetime == 'NULL'):
                     record['start_datetime'] = ''
                 else:
                     record['start_datetime'] = start_datetime
             end_datetime = sanitizeText(input(
-                "When does the event end : "+str(record['end_datetime'])+' --> '))
+                "When does the event end : %s",(record['end_datetime'])+' --> '))
             if end_datetime:
                 if (end_datetime == 'NULL'):
                     record['end_datetime'] = ''
@@ -120,7 +120,7 @@ def modifyEmployee(cur, con):
         SearchEmp(name, cur, con)
         emp_id = int(
             sanitizeText(input("Enter Employee ID of the record you want to modify : ")))
-        cur.execute("SELECT * FROM EMPLOYEE WHERE emp_id="+str(emp_id))
+        cur.execute("SELECT * FROM EMPLOYEE WHERE emp_id=%s",(emp_id))
         record = cur.fetchone()
         if (record is None):
             raise Exception("This Employee ID doesnt exist!")
@@ -128,14 +128,14 @@ def modifyEmployee(cur, con):
             print(
                 "Press enter to accept current value, or type the new value, type NULL to set it to NULL.")
             fname = sanitizeText(
-                input("First Name : "+str(record['fname'])+' --> '))
+                input("First Name : %s",(record['fname'])+' --> '))
             if fname:
                 if (fname == 'NULL'):
                     record['fname'] = ''
                 else:
                     record['fname'] = fname
             lname = sanitizeText(
-                input("Last Name : "+str(record['lname'])+' --> '))
+                input("Last Name : %s",(record['lname'])+' --> '))
             if lname:
                 if (lname == 'NULL'):
                     record['lname'] = ''
@@ -149,7 +149,7 @@ def modifyEmployee(cur, con):
                 else:
                     record['doj'] = doj
             salary = sanitizeText(
-                input("Salary : "+str(record['salary'])+' --> '))
+                input("Salary : %s",(record['salary'])+' --> '))
             if salary:
                 if (salary == 'NULL'):
                     record['salary'] = 0
