@@ -24,7 +24,7 @@ def delContact(cur, con):
         print(table.draw())
         while (len(todelete) <= len(cust)):
             sno = input(
-                "Enter the Sno of the Phone no. you want to delete, leave blank to quit :")
+                "Enter the Sno of the Phone no. you want to delete, leave blank to quit(proceed) :")
             if sno and int(sno) > 0:
                 sno = int(sno)
                 todel = cust[sno-1]
@@ -87,16 +87,16 @@ def delSpecialGuest(cur, con):
             spec.append(row)
             table.add_row([i+1, row['name']])
         if len(spec) == 0:
-            raise Exception("This event has no special guests stored!")
+            raise Exception("This event has no special guests stored Or The event does not exist")
         print(table.draw())
         while(len(todelete) <= len(spec)):
             sno = input(
-                "Enter the Serial No(From the list) of the name you want to delete | leave blank to quit: ")
-            if sno:
+                "Enter the Serial No(From the list) of the name you want to delete | leave blank to quit(proceed): ")
+            if sno and int(sno) > 0:
                 sno = int(sno)
-                if(sno <= len(spec)):
-                    print("Serial No. out of range!")
-                    continue
+                #if(sno <= len(spec)):
+                #    print("Serial No. out of range!")
+                #    continue
                 todel = spec[sno-1]
                 if(todel in todelete):
                     print("Special Guest already deleted")
