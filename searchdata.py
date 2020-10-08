@@ -5,10 +5,7 @@ def lsEmpByCity(cur, con):
     try:
         # Takes City name as input
         city = input("Enter the City name to search for: ")
-
-        query = "SELECT * FROM EMPLOYEE WHERE city_of_work='%s'" % city
-
-        cur.execute(query)
+        cur.execute("SELECT * FROM EMPLOYEE WHERE city_of_work=%s", city)
         print("List of employees in ", city)
         table = Texttable()
         table.header(["Emp ID", "Fname", "Lname", "D.O.J.",
@@ -29,9 +26,8 @@ def lsAgentByCity(cur, con):
     try:
         # takes city name as input
         city = input("Enter the City name you want to search in: ")
-        query = "SELECT fname, lname, contact FROM AGENT, EMPLOYEE WHERE agent_id=emp_id AND city_of_work='%s'" % (
-                city)
-        cur.execute(query)
+        cur.execute(
+            "SELECT fname, lname, contact FROM AGENT, EMPLOYEE WHERE agent_id=emp_id AND city_of_work=%s", city)
         if(cur == 0):
             print("No agents in the given city.")
             return
@@ -50,9 +46,8 @@ def lsAgentByCity(cur, con):
 
 def lsManagerByCity(city, cur, con):
     try:
-        query = "SELECT emp_id, fname, lname, contact FROM MANAGER, EMPLOYEE WHERE mgr_id=emp_id AND city_of_work='%s'" % (
-            city)
-        if (cur.execute(query) == 0):
+        if (cur.execute("SELECT emp_id, fname, lname, contact FROM MANAGER, EMPLOYEE WHERE mgr_id=emp_id AND city_of_work=%s", (
+                city)) == 0):
             print("No Managers in the given city.")
             return -1
         print("List of Managers in:", city)
@@ -73,9 +68,8 @@ def lsEventBwDates(cur, con):
     try:
         date_start = input("Enter the start date(YYYY-MM-DD): ")
         date_end = input("Enter the end date(YYYY-MM-DD): ")
-        query = "SELECT type,name,start_datetime,end_datetime FROM EVENT WHERE start_datetime >= '%s' AND end_datetime <= '%s'" % (
-                date_start, date_end)
-        cur.execute(query)
+        cur.execute("SELECT type,name,start_datetime,end_datetime FROM EVENT WHERE start_datetime >= %s AND end_datetime <= %s", (
+            date_start, date_end))
         print("Events in between are: ")
         table = Texttable()
         table.header(["Type", "Name", "Start", "End"])
@@ -92,9 +86,7 @@ def lsEventBwDates(cur, con):
 
 def SearchEvents(x, cur, con):
     try:
-
-        query = "SELECT * FROM EVENT WHERE name LIKE '%s'" % ("%"+x+"%")
-        cur.execute(query)
+        cur.execute("SELECT * FROM EVENT WHERE name LIKE %s", ("%"+x+"%"))
         table = Texttable()
         table.header(["Event ID", "Start", "End", "Type",
                       "Name", "City", "Booking ID"])
@@ -112,10 +104,8 @@ def SearchEvents(x, cur, con):
 
 def SearchEmp(x, cur, con):
     try:
-
-        query = "SELECT * FROM EMPLOYEE WHERE fname LIKE '%s' OR lname LIKE '%s'" % (
-            "%"+x+"%", "%"+x+"%")
-        cur.execute(query)
+        cur.execute(
+            "SELECT * FROM EMPLOYEE WHERE fname LIKE %s OR lname LIKE %s", ("%"+x+"%", "%"+x+"%"))
         table = Texttable()
         table.header(["Emp ID", "Fname", "Lname", "D.O.J.",
                       "Salary", "City of Work", "Contact"])
@@ -133,10 +123,8 @@ def SearchEmp(x, cur, con):
 
 def SearchCust(x, cur, con):
     try:
-
-        query = "SELECT * FROM CUSTOMER WHERE fname LIKE '%s' OR lname LIKE '%s'" % (
-            "%"+x+"%", "%"+x+"%")
-        cur.execute(query)
+        cur.execute("SELECT * FROM CUSTOMER WHERE fname LIKE %s OR lname LIKE %s", (
+            "%"+x+"%", "%"+x+"%"))
         table = Texttable()
         table.header(["Cust ID", "Fname", "Lname", "POI Type",
                       "POI Number", "Contact"])
