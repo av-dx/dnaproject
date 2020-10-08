@@ -10,7 +10,7 @@ def delContact(cur, con):
         SearchCust(name, cur, con)
         cust_id = int(
             input("Enter the customer ID whose contact you want to delete : "))
-        cur.execute("SELECT * FROM CONTACT WHERE cust_id=%d" % (cust_id))
+        cur.execute("SELECT * FROM CONTACT WHERE cust_id=%d",(cust_id))
         cust = []
         todelete = []
         table = Texttable()
@@ -33,7 +33,7 @@ def delContact(cur, con):
                     continue
                 else:
                     todelete.append(todel)
-                    cur.execute("DELETE FROM CONTACT WHERE cust_id=%d AND phone='%s'" % (
+                    cur.execute("DELETE FROM CONTACT WHERE cust_id=%d AND phone=%s",(
                         cust_id, todel['phone']))
                     continue
             else:
@@ -58,13 +58,12 @@ def delReportsTo(agent_id, mgr_id, cur, con):
         if (agent_id == 'any') and (mgr_id == 'any'):
             raise Exception("Invalid arguments to delReportsTo()")
         elif agent_id == 'any':
-            query = "DELETE FROM REPORTS_TO WHERE mgr_id=%d" % (mgr_id)
+            cur.execute("DELETE FROM REPORTS_TO WHERE mgr_id=%d",(mgr_id))
         elif mgr_id == 'any':
-            query = "DELETE FROM REPORTS_TO WHERE agent_id=%d" % (agent_id)
+            cur.execute("DELETE FROM REPORTS_TO WHERE agent_id=%d",(agent_id))
         else:
-            query = "DELETE FROM REPORTS_TO WHERE agent_id=%d AND mgr_id=%d" % (
-                agent_id, mgr_id)
-        cur.execute(query)
+            cur.execute("DELETE FROM REPORTS_TO WHERE agent_id=%d AND mgr_id=%d",(
+                agent_id, mgr_id))
         con.commit()
     except Exception as e:
         con.rollback()
@@ -78,8 +77,7 @@ def delSpecialGuest(cur, con):
         SearchEvents(eventname, cur, con)
         required_id = int(
             input("Enter the event ID you want to perform the operation in: "))
-        cur.execute("SELECT * FROM SPECIAL_GUEST WHERE event_id = %d" %
-                    (required_id))
+        cur.execute("SELECT * FROM SPECIAL_GUEST WHERE event_id = %d",(required_id))
         spec = []
         todelete = []
         table = Texttable()
@@ -105,7 +103,7 @@ def delSpecialGuest(cur, con):
                     continue
                 else:
                     todelete.append(todel)
-                    cur.execute("DELETE FROM SPECIAL_GUEST WHERE event_id = %d AND name = %s" % (
+                    cur.execute("DELETE FROM SPECIAL_GUEST WHERE event_id = %d AND name = %s",(
                         required_id, todel['name']))
                     continue
             else:
@@ -127,13 +125,9 @@ def delSpecialGuest(cur, con):
 
 def delAgent(agent_id,cur,con):
     try:
-        query = "DELETE FROM REPORTS_TO WHERE agent_id=%d" % (
-            agent_id)
-        cur.execute(query)
-        query = "DELETE FROM AGENT WHERE agent_id=%d" % (agent_id)
-        cur.execute(query)
-        query = "DELETE FROM EMPLOYEE WHERE emp_id=%d" % (agent_id)
-        cur.execute(query)
+        cur.execute("DELETE FROM REPORTS_TO WHERE agent_id=%d", (agent_id))
+        cur.execute("DELETE FROM AGENT WHERE agent_id=%d",(agent_id))
+        cur.execute("DELETE FROM EMPLOYEE WHERE emp_id=%d",(agent_id))
         con.commit()
         print("Deletion Successful")
         return 0
@@ -153,13 +147,13 @@ def delEmployee(cur, con):
         emp_id = int(
             input("Enter the Employee ID who you want to fire(delete) : "))
         agent = cur.execute(
-            "SELECT emp_id,fname, lname, bookings_made FROM EMPLOYEE, AGENT WHERE emp_id IN (SELECT agent_id FROM AGENT) AND emp_id=%d" % (emp_id))
+            "SELECT emp_id,fname, lname, bookings_made FROM EMPLOYEE, AGENT WHERE emp_id IN (SELECT agent_id FROM AGENT) AND emp_id=%d",(emp_id))
         manager = cur.execute(
-            "SELECT emp_id,fname, lname, years_of_experience FROM EMPLOYEE, MANAGER WHERE emp_id IN (SELECT mgr_id FROM MANAGER) AND emp_id=%d" % (emp_id))
+            "SELECT emp_id,fname, lname, years_of_experience FROM EMPLOYEE, MANAGER WHERE emp_id IN (SELECT mgr_id FROM MANAGER) AND emp_id=%d",(emp_id))
         admin = cur.execute(
-            "SELECT emp_id,fname, lname, qualification FROM EMPLOYEE, ADMINISTRATOR WHERE emp_id IN (SELECT admin_id FROM ADMINISTRATOR) AND emp_id=%d" % (emp_id))
+            "SELECT emp_id,fname, lname, qualification FROM EMPLOYEE, ADMINISTRATOR WHERE emp_id IN (SELECT admin_id FROM ADMINISTRATOR) AND emp_id=%d",(emp_id))
         tech = cur.execute(
-            "SELECT emp_id,fname, lname, tlevel FROM EMPLOYEE, TECHNICIAN WHERE emp_id IN (SELECT tech_id FROM TECHNICIAN) AND emp_id=%d" % (emp_id))
+            "SELECT emp_id,fname, lname, tlevel FROM EMPLOYEE, TECHNICIAN WHERE emp_id IN (SELECT tech_id FROM TECHNICIAN) AND emp_id=%d", (emp_id))
 
         print("Currently this employee is a", end=' ')
         if(tech > 0):
@@ -174,22 +168,17 @@ def delEmployee(cur, con):
         if (input("Do you wish to delete this Employee (y/N) ?").lower() == 'y'):
 
             if(agent>0):
-                query = "DELETE FROM REPORTS_TO WHERE agent_id=%d" % (
-                    emp_id)
-                cur.execute(query)
+                cur.execute("DELETE FROM REPORTS_TO WHERE agent_id=%d" , (emp_id))
             if(manager>0):#to handle min max constarint of agent and managers
-                query1 = "SELECT agent_id FROM REPORTS_TO WHERE mgr_id=%d" % (emp_id)
-                cur.execute(query1)
+                cur.execute("SELECT agent_id FROM REPORTS_TO WHERE mgr_id=%d" , (emp_id))
                 list1 = []
                 for row in cur:
                     list1.append(row['agent_id'])
 
 
-                query2 = "DELETE FROM REPORTS_TO WHERE mgr_id=%d" % (
-                    emp_id)
-                cur.execute(query2)
-                query = "DELETE FROM MANAGER WHERE mgr_id=%d" % (emp_id)
-                cur.execute(query)
+                cur.execute("DELETE FROM REPORTS_TO WHERE mgr_id=%d" , (
+                    emp_id))
+                cur.execute("DELETE FROM MANAGER WHERE mgr_id=%d" , (emp_id))
                 cur.execute("SELECT agent_id FROM REPORTS_TO")
                 list2 = []
                 for row in cur:
@@ -197,7 +186,7 @@ def delEmployee(cur, con):
 
                 for agent_id in list1:
                     if agent_id not in list2:
-                        cur.execute("SELECT emp_id,fname,lname,city_of_work FROM AGENT, EMPLOYEE WHERE agent_id=%d AND agent_id=emp_id" % (agent_id))
+                        cur.execute("SELECT emp_id,fname,lname,city_of_work FROM AGENT, EMPLOYEE WHERE agent_id=%d AND agent_id=emp_id" , (agent_id))
                         table = Texttable()
                         table.header(["Emp ID", "First Name", "Last Name", "City"])
                         table.set_cols_dtype(["i", "t", "t", "t"])
@@ -219,16 +208,11 @@ def delEmployee(cur, con):
                             print("Wrong input.")
                             raise Exception("Wrong input. Deletion cancelled!")
 
-            query = "DELETE FROM AGENT WHERE agent_id=%d" % (emp_id)
-            cur.execute(query)
-            query = "DELETE FROM MANAGER WHERE mgr_id=%d" % (emp_id)
-            cur.execute(query)
-            query = "DELETE FROM ADMINISTRATOR WHERE admin_id=%d" % (emp_id)
-            cur.execute(query)
-            query = "DELETE FROM TECHNICIAN WHERE tech_id=%d" % (emp_id)
-            cur.execute(query)
-            query = "DELETE FROM EMPLOYEE WHERE emp_id=%d" % (emp_id)
-            cur.execute(query)
+            cur.execute("DELETE FROM AGENT WHERE agent_id=%d" , (emp_id))
+            cur.execute("DELETE FROM MANAGER WHERE mgr_id=%d" , (emp_id))
+            cur.execute("DELETE FROM ADMINISTRATOR WHERE admin_id=%d" , (emp_id))
+            cur.execute("DELETE FROM TECHNICIAN WHERE tech_id=%d" , (emp_id))
+            cur.execute("DELETE FROM EMPLOYEE WHERE emp_id=%d" , (emp_id))
             con.commit()
             print("Deletion Successful")
         else:
