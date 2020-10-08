@@ -24,7 +24,7 @@ def insertCustomer(cur, con):
         return None
 
 
-def insertEvent(cur, con):
+def insertEvent(agent_id, cur, con):
     try:
         print("Enter the Event details: ")
         row = {}
@@ -37,6 +37,13 @@ def insertEvent(cur, con):
         row['name'] = input("Name of the Event: ")
         row['city'] = input(
             "City where the event is going to be held: ")
+
+        query = "SELECT city_of_work FROM AGENT,EMPLOYEE WHERE agent_id=emp_id AND agent_id=%s"
+        cur.execute(query, agent_id)
+        AgCity = cur.fetchone()['city_of_work']
+        if(row['city'] != AgCity):
+            raise Exception(
+                "The Agent cannot book events for this city as he does not work here!")
 
         print("Event will be added after booking payment !")
         print("Enter payment details : ")
@@ -230,7 +237,7 @@ def makeBooking(cur, con):
         print("Make a booking for Customer :", cust['fname'], cust['lname'],
               "through Agent :", agent['fname'], agent['lname'], "?", sep=' ')
         if (input("Y/N : ").lower() == 'y'):
-            ebpair = insertEvent(cur, con)
+            ebpair = insertEvent(row['agent_id'], cur, con)
             if (ebpair is None):
                 raise Exception("Booking failed : Event could not be added")
             row['event_id'] = ebpair[0]
