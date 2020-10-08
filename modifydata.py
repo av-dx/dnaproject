@@ -1,5 +1,6 @@
 from searchdata import SearchCust, SearchEvents, SearchEmp, lsManagerByCity
 from insertdata import insertAgent, insertReportsTo
+from deletedata import delAgent, delReportsTo
 
 
 def modifyCustomer(cur, con):
@@ -148,11 +149,13 @@ def modifyEmployee(cur, con):
                 else:
                     record['salary'] = float(salary)
             city_of_work = input("City: %s ---> " % record['city_of_work'])
+            old_city_of_work = record['city_of_work']
             if city_of_work:
                 if (city_of_work == 'NULL'):
                     record['city_of_work'] = ''
                 else:
                     record['city_of_work'] = city_of_work
+
             contact = input("Contact: %s ---> " % record['contact'])
             if contact:
                 if (contact == 'NULL'):
@@ -199,10 +202,14 @@ def modifyEmployee(cur, con):
                     continue
                 else:
                     break
+            if ((newrole == role) and (newrole == 1) and (old_city_of_work != record['city_of_work'])):
+                delReportsTo(emp_id,'any',cur,con)
+                insertAgent(emp_id, cur, con)
 
             if (newrole != role):
                 cur.execute("DELETE FROM REPORTS_TO WHERE agent_id=%s OR mgr_id=%s", (
                     emp_id, emp_id))
+
                 cur.execute("DELETE FROM AGENT WHERE agent_id=%s", (emp_id))
                 cur.execute("DELETE FROM MANAGER WHERE mgr_id=%s", (emp_id))
                 cur.execute("DELETE FROM ADMINISTRATOR WHERE admin_id=%s", (

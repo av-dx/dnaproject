@@ -127,16 +127,14 @@ def delAgent(agent_id,cur,con):
     try:
         cur.execute("DELETE FROM REPORTS_TO WHERE agent_id=%s", (agent_id))
         cur.execute("DELETE FROM AGENT WHERE agent_id=%s",(agent_id))
-        cur.execute("DELETE FROM EMPLOYEE WHERE emp_id=%s",(agent_id))
         con.commit()
         print("Deletion Successful")
         return 0
 
     except Exception as e:
         con.rollback()
-        print("Failed to delete employees from database")
+        print("Failed to delete agent from database")
         print(">>>>>>>>>>>>>", e)
-        return -1
 
 
 def delEmployee(cur, con):
@@ -198,8 +196,8 @@ def delEmployee(cur, con):
                         print("2. Replace with existing Manager/Hire new manager")
                         agmg = int(input())
                         if (agmg == 1):
-                            if(delAgent(agent_id,cur,con) == -1):
-                                return
+                            delAgent(agent_id,cur,con)
+                            cur.execute("DELETE FROM EMPLOYEE WHERE emp_id=%s",(agent_id))
                         elif (agmg == 2):
                             mgr_id = insertAgent(agent_id,cur,con)
                             print("The agent %s now reports to manager %s" % (agent_id,mgr_id))
@@ -209,6 +207,7 @@ def delEmployee(cur, con):
                             raise Exception("Wrong input. Deletion cancelled!")
 
             cur.execute("DELETE FROM AGENT WHERE agent_id=%s" , (emp_id))
+            cur.execute("DELETE FROM EMPLOYEE WHERE emp_id=%s",(agent_id))
             cur.execute("DELETE FROM MANAGER WHERE mgr_id=%s" , (emp_id))
             cur.execute("DELETE FROM ADMINISTRATOR WHERE admin_id=%s" , (emp_id))
             cur.execute("DELETE FROM TECHNICIAN WHERE tech_id=%s" , (emp_id))
